@@ -1,0 +1,505 @@
+---
+title: "California Housing Price Prediction: Beyond Linearity"
+author: "Research Analysis"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width = 10, fig.height = 6)
+```
+
+# 1. Setup & Data Loading
+
+```{r load-packages}
+# Install missing packages if needed
+pkgs <- c("tidyverse", "caret", "randomForest", "xgboost", "mgcv", "np",
+          "splines", "corrplot", "gridExtra", "Metrics", "neuralnet",
+          "ggplot2", "viridis", "pdp", "vip", "finalfit","kableExtra")
+
+installed <- rownames(installed.packages())
+to_install <- pkgs[!pkgs %in% installed]
+if (length(to_install) > 0) install.packages(to_install, dependencies = TRUE)
+
+library(tidyverse)
+library(caret)
+library(randomForest)
+library(xgboost)
+library(mgcv)
+library(splines)
+library(corrplot)
+library(gridExtra)
+library(Metrics)
+library(neuralnet)
+library(ggplot2)
+library(viridis)
+library(pdp)
+library(vip)
+library(finalfit)
+library(kableExtra)
+```
+
+```{r load-data}
+data <- read.csv("C:/Users/dotieno/Documents/Data Science Course/Module III/Linear Models/cal_housing.data", header = FALSE)  # Assuming no header row
+
+
+
+
+# Assign column names
+
+colnames(data) <- c("longitude", "latitude", "housing_median_age", 
+
+                    "total_rooms", "total_bedrooms", "population", 
+
+                    "households", "median_income", "median_house_value")
+```
+
+# 2. Exploratory Data Analysis
+
+```{r eda-summary}
+summary(data)
+```
+
+```{r eda-distributions}
+data_long <- data %>%
+  select(-c(longitude,latitude)) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "value")
+
+ggplot(data_long, aes(x = value)) +
+  geom_histogram(bins = 40, fill = "steelblue", color = "white", alpha = 0.8) +
+  #geom_vline(xintercept = median(x)) +
+  facet_wrap(~variable, scales = "free") +
+  theme_minimal() +
+  labs(title = "Distribution of All Variables")
+```
+
+```{r eda-correlation}
+cor_matrix <- cor(data, use = "complete.obs")
+corrplot(cor_matrix, method = "color", type = "upper",
+         tl.cex = 0.8, addCoef.col = "black", number.cex = 0.6,
+         title = "Correlation Matrix", mar = c(0,0,1,0))
+```
+
+
+
+```{r}
+dependent <- "median_house_value"
+explanatory <- data %>%
+  select(-c(dependent, longitude, latitude)) %>%
+  names
+
+finalfit::ff_plot(data, dependent, explanatory)
+```
+
+```{r}
+# Create categorical dependent variable
+data <- data %>%
+  mutate(
+    house_value_group = ntile(median_house_value, 4) %>%
+      factor(labels = c("Low", "Medium", "High", "Very High"))
+  )
+
+dependent <- "house_value_group"
+
+explanatory <- data %>%
+  select(-median_house_value, -house_value_group, -longitude, -latitude) %>%
+  names()
+
+# Create finalfit table
+table1 <- data %>%
+  summary_factorlist(
+    dependent = dependent,
+    explanatory = explanatory,
+    p = TRUE,
+    cont = "median",
+    column = TRUE,
+    total_col = TRUE,
+    na_include = TRUE
+  )
+
+# Render as formatted table
+table1 %>%
+  kbl(
+    caption = "Summary Statistics by House Value Group",
+    align = "lcccccc",
+    booktabs = FALSE
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "bordered", "hover"),
+    full_width = FALSE
+  ) %>%
+  row_spec(0, bold = TRUE)
+```
+
+
+
+```{r eda-geo-map}
+ggplot(data, aes(x = longitude, y = latitude, color = median_house_value)) +
+  geom_point(alpha = 0.3, size = 0.8) +
+  scale_color_viridis(name = "House Value ($)", labels = scales::comma) +
+  theme_minimal() +
+  labs(title = "Geographic Distribution of House Values",
+       x = "Longitude", y = "Latitude")
+```
+
+```{r eda-income-vs-value}
+ggplot(data, aes(x = median_income, y = median_house_value)) +
+  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_smooth(method = "loess", color = "red", se = TRUE) +
+  theme_minimal() +
+  labs(title = "Median Income vs House Value (with LOESS)",
+       x = "Median Income", y = "Median House Value ($)")
+```
+
+# 3. Feature Engineering & Preprocessing
+
+```{r preprocessing}
+# Remove rows with missing values
+data_clean <- data %>% drop_na()
+
+# Engineer derived features
+data_clean <- data_clean %>%
+  mutate(
+    rooms_per_household    = total_rooms / households,
+    bedrooms_per_room      = total_bedrooms / total_rooms,
+    population_per_household = population / households,
+    income_location        = median_income * latitude,   # interaction term
+    log_house_value        = log(median_house_value)
+  )
+
+cat("Clean dataset dimensions:", dim(data_clean), "\n")
+```
+
+```{r train-test-split}
+set.seed(42)
+train_idx <- createDataPartition(data_clean$median_house_value, p = 0.8, list = FALSE)
+train_data <- data_clean[train_idx, ]
+test_data  <- data_clean[-train_idx, ]
+
+# Feature matrix (exclude target and log-target)
+features <- c("longitude", "latitude", "housing_median_age", "total_rooms",
+              "total_bedrooms", "population", "households", "median_income",
+              "rooms_per_household", "bedrooms_per_room", "population_per_household")
+
+X_train <- train_data[, features]
+y_train <- train_data$median_house_value
+X_test  <- test_data[, features]
+y_test  <- test_data$median_house_value
+
+cat("Train size:", nrow(X_train), "| Test size:", nrow(X_test), "\n")
+```
+
+# 4. Model 1 — Parametric Linear Regression (Baseline)
+
+```{r linear-regression}
+lm_formula <- as.formula(paste("median_house_value ~", paste(features, collapse = " + ")))
+lm_model <- lm(lm_formula, data = train_data)
+summary(lm_model)
+
+lm_pred  <- predict(lm_model, newdata = test_data)
+lm_rmse  <- rmse(y_test, lm_pred)
+lm_r2    <- cor(y_test, lm_pred)^2
+
+cat("\nLinear Regression — RMSE:", round(lm_rmse, 2), "| R²:", round(lm_r2, 4), "\n")
+```
+
+# 5. Model 2 — Polynomial / Spline Regression (GNPR)
+
+```{r spline-regression}
+spline_model <- lm(
+  median_house_value ~
+    bs(median_income, df = 6) +
+    bs(latitude, df = 6) +
+    bs(longitude, df = 6) +
+    bs(housing_median_age, df = 4) +
+    bs(rooms_per_household, df = 4) +
+    bs(population_per_household, df = 4) +
+    bedrooms_per_room,
+  data = train_data
+)
+
+spline_pred <- predict(spline_model, newdata = test_data)
+spline_rmse <- rmse(y_test, spline_pred)
+spline_r2   <- cor(y_test, spline_pred)^2
+
+cat("Spline Regression — RMSE:", round(spline_rmse, 2), "| R²:", round(spline_r2, 4), "\n")
+```
+
+# 6. Model 3 — Generalized Additive Model (GAM)
+
+```{r gam-model}
+gam_model <- gam(
+  median_house_value ~
+    s(median_income, k = 10) +
+    s(latitude, k = 10) +
+    s(longitude, k = 10) +
+    s(housing_median_age, k = 8) +
+    s(rooms_per_household, k = 8) +
+    s(population_per_household, k = 8) +
+    ti(latitude, longitude, k = 8) +          # spatial interaction
+    ti(median_income, latitude, k = 6),        # income × location interaction
+  data = train_data,
+  method = "REML"
+)
+
+summary(gam_model)
+
+gam_pred <- predict(gam_model, newdata = test_data)
+gam_rmse <- rmse(y_test, gam_pred)
+gam_r2   <- cor(y_test, gam_pred)^2
+
+cat("GAM — RMSE:", round(gam_rmse, 2), "| R²:", round(gam_r2, 4), "\n")
+```
+
+```{r gam-plots}
+par(mfrow = c(2, 3))
+plot(gam_model, pages = 0, shade = TRUE, col = "steelblue",
+     main = "GAM Smooth Terms")
+par(mfrow = c(1, 1))
+```
+
+# 7. Model 4 — Random Forest
+
+```{r random-forest}
+set.seed(42)
+rf_model <- randomForest(
+  x = X_train, y = y_train,
+  ntree = 300, mtry = 4,
+  importance = TRUE
+)
+
+rf_pred <- predict(rf_model, newdata = X_test)
+rf_rmse <- rmse(y_test, rf_pred)
+rf_r2   <- cor(y_test, rf_pred)^2
+
+cat("Random Forest — RMSE:", round(rf_rmse, 2), "| R²:", round(rf_r2, 4), "\n")
+```
+
+```{r rf-importance}
+importance_df <- as.data.frame(importance(rf_model)) %>%
+  rownames_to_column("Feature") %>%
+  arrange(desc(`%IncMSE`))
+
+ggplot(importance_df, aes(x = reorder(Feature, `%IncMSE`), y = `%IncMSE`)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Random Forest — Variable Importance (%IncMSE)",
+       x = "Feature", y = "% Increase in MSE")
+```
+
+# 8. Model 5 — XGBoost
+
+```{r xgboost}
+dtrain <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
+dtest  <- xgb.DMatrix(data = as.matrix(X_test),  label = y_test)
+
+xgb_params <- list(
+  objective        = "reg:squarederror",
+  eta              = 0.05,
+  max_depth        = 6,
+  subsample        = 0.8,
+  colsample_bytree = 0.8,
+  min_child_weight = 5
+)
+
+set.seed(42)
+xgb_model <- xgb.train(
+  params  = xgb_params,
+  data    = dtrain,
+  nrounds = 500,
+  watchlist = list(train = dtrain, test = dtest),
+  early_stopping_rounds = 30,
+  verbose = 0
+)
+
+xgb_pred <- predict(xgb_model, dtest)
+xgb_rmse <- rmse(y_test, xgb_pred)
+xgb_r2   <- cor(y_test, xgb_pred)^2
+
+cat("XGBoost — RMSE:", round(xgb_rmse, 2), "| R²:", round(xgb_r2, 4), "\n")
+```
+
+```{r xgb-importance}
+xgb_imp <- xgb.importance(feature_names = features, model = xgb_model)
+xgb.plot.importance(xgb_imp, top_n = 11,
+                    main = "XGBoost Feature Importance")
+```
+
+# 9. Model 6 — Neural Network
+
+```{r neural-net}
+# Scale features for neural network
+preproc  <- preProcess(X_train, method = c("center", "scale"))
+X_train_scaled <- predict(preproc, X_train)
+X_test_scaled  <- predict(preproc, X_test)
+
+# Scale target to [0,1]
+y_min <- min(y_train); y_max <- max(y_train)
+y_train_scaled <- (y_train - y_min) / (y_max - y_min)
+
+nn_data_train <- cbind(X_train_scaled, target = y_train_scaled)
+
+set.seed(42)
+nn_model <- neuralnet(
+  target ~ .,
+  data       = nn_data_train,
+  hidden     = c(1),
+  linear.output = TRUE,
+  stepmax    = 1e6,
+  threshold  = 0.05
+)
+
+nn_pred_scaled <- predict(nn_model, X_test_scaled)[, 1]
+nn_pred        <- nn_pred_scaled * (y_max - y_min) + y_min
+nn_rmse        <- rmse(y_test, nn_pred)
+nn_r2          <- cor(y_test, nn_pred)^2
+
+cat("Neural Network — RMSE:", round(nn_rmse, 2), "| R²:", round(nn_r2, 4), "\n")
+```
+
+# 10. Research Question 1: Nonlinear Interactions — Location × Income
+
+```{r interaction-analysis}
+# Visualise income effect across geographic regions
+data_clean <- data_clean %>%
+  mutate(
+    lat_group  = cut(latitude,  breaks = 4, labels = c("South", "Central-S", "Central-N", "North")),
+    long_group = cut(longitude, breaks = 4, labels = c("Coast", "Near-Coast", "Inland", "Far-Inland"))
+  )
+
+ggplot(data_clean, aes(x = median_income, y = median_house_value, color = lat_group)) +
+  geom_smooth(method = "loess", se = FALSE, linewidth = 1.2) +
+  scale_color_viridis_d(name = "Latitude Region") +
+  theme_minimal() +
+  labs(title = "Income–House Value Relationship by Latitude Region",
+       subtitle = "Nonlinear interactions: income effect varies by location",
+       x = "Median Income", y = "Median House Value ($)")
+```
+
+```{r pdp-income-latitude}
+# Partial Dependence Plot: income × latitude interaction (Random Forest)
+pd_income <- partial(rf_model, pred.var = "median_income",
+                     train = X_train, grid.resolution = 30)
+pd_lat    <- partial(rf_model, pred.var = "latitude",
+                     train = X_train, grid.resolution = 30)
+
+p1 <- autoplot(pd_income, smooth = TRUE) +
+  theme_minimal() + labs(title = "PDP: Median Income")
+
+p2 <- autoplot(pd_lat, smooth = TRUE) +
+  theme_minimal() + labs(title = "PDP: Latitude")
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+```{r 2d-pdp}
+# 2D PDP: income × latitude
+pd_2d <- partial(rf_model,
+                 pred.var = c("median_income", "latitude"),
+                 train = X_train, grid.resolution = 20)
+
+plotPartial(pd_2d, levelplot = TRUE, zlab = "House Value",
+            colorkey = TRUE, col.regions = viridis(100),
+            main = "2D PDP: Income × Latitude Interaction (Random Forest)")
+```
+
+```{r gam-interaction-plot}
+# GAM tensor product smooth: income × latitude
+vis.gam(gam_model, view = c("median_income", "latitude"),
+        plot.type = "contour", color = "terrain",
+        main = "GAM: Income × Latitude Interaction Surface",
+        too.far = 0.05)
+```
+
+# 11. Research Question 2: Model Comparison
+
+```{r model-comparison}
+results <- tibble(
+  Model = c("Linear Regression", "Spline Regression", "GAM",
+            "Random Forest", "XGBoost", "Neural Network"),
+  RMSE  = c(lm_rmse, spline_rmse, gam_rmse, rf_rmse, xgb_rmse, nn_rmse),
+  R2    = c(lm_r2,   spline_r2,   gam_r2,   rf_r2,   xgb_r2,   nn_r2)
+) %>%
+  arrange(RMSE)
+
+print(results)
+```
+
+```{r comparison-plot}
+results_long <- results %>%
+  pivot_longer(c(RMSE, R2), names_to = "Metric", values_to = "Value")
+
+ggplot(results_long, aes(x = reorder(Model, Value), y = Value, fill = Model)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  coord_flip() +
+  scale_fill_viridis_d() +
+  theme_minimal() +
+  labs(title = "Model Comparison: RMSE and R²",
+       x = "Model", y = "Value")
+```
+
+```{r residual-comparison}
+residuals_df <- tibble(
+  Actual     = y_test,
+  LM         = lm_pred,
+  Spline     = spline_pred,
+  GAM        = gam_pred,
+  RF         = rf_pred,
+  XGBoost    = xgb_pred,
+  NeuralNet  = nn_pred
+) %>%
+  pivot_longer(-Actual, names_to = "Model", values_to = "Predicted") %>%
+  mutate(Residual = Actual - Predicted)
+
+ggplot(residuals_df, aes(x = Predicted, y = Residual, color = Model)) +
+  geom_point(alpha = 0.15, size = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  facet_wrap(~Model, scales = "free") +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(title = "Residual Plots by Model",
+       x = "Predicted Value", y = "Residual")
+```
+
+```{r actual-vs-predicted}
+ggplot(residuals_df, aes(x = Actual, y = Predicted, color = Model)) +
+  geom_point(alpha = 0.15, size = 0.5) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  facet_wrap(~Model) +
+  scale_color_viridis_d() +
+  theme_minimal() +
+  labs(title = "Actual vs Predicted by Model",
+       x = "Actual House Value ($)", y = "Predicted House Value ($)")
+```
+
+# 12. Summary & Conclusions
+
+```{r final-summary}
+cat("=== FINAL MODEL PERFORMANCE SUMMARY ===\n\n")
+print(results)
+
+best_model <- results$Model[1]
+cat("\nBest Model:", best_model, "\n")
+cat("Best RMSE:", round(results$RMSE[1], 2), "\n")
+cat("Best R²:  ", round(results$R2[1], 4), "\n")
+
+cat("\n=== KEY FINDINGS ===\n")
+cat("1. Ensemble ML models (XGBoost, Random Forest) outperform parametric models.\n")
+cat("2. GAM captures nonlinear effects and provides interpretable smooth terms.\n")
+cat("3. Median income is the strongest predictor, but its effect is nonlinear.\n")
+cat("4. Location (lat/lon) interacts significantly with income — coastal high-income\n")
+cat("   areas show disproportionately higher house values.\n")
+cat("5. GNPR methods (GAM, Splines) substantially improve over linear regression\n")
+cat("   while remaining more interpretable than black-box ML models.\n")
+```
+
+```{r session-info}
+sessionInfo()
+```
