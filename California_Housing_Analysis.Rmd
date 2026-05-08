@@ -10,9 +10,12 @@ output:
     highlight: tango
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width = 10, fig.height = 6)
 ```
+
+
 
 # 1. Setup & Data Loading
 
@@ -20,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width =
 # Install missing packages if needed
 pkgs <- c("tidyverse", "caret", "randomForest", "xgboost", "mgcv", "np",
           "splines", "corrplot", "gridExtra", "Metrics", "neuralnet",
-          "ggplot2", "viridis", "pdp", "vip", "finalfit","kableExtra")
+          "ggplot2", "viridis", "pdp", "vip", "spdep", "sf", "kableExtra")
 
 installed <- rownames(installed.packages())
 to_install <- pkgs[!pkgs %in% installed]
@@ -41,11 +44,20 @@ library(viridis)
 library(pdp)
 library(vip)
 library(finalfit)
+library(spdep)
+library(sf)
 library(kableExtra)
 ```
 
+Objectives:
+1. To predict house prices using ensemble of non-linear, GNPR and Parametric regression models.
+2. Identify the most important non-linear interactions between location and income
+3. Compare the models from objective one above based on the predictive accuracy. 
+
+
+
 ```{r load-data}
-data <- read.csv("C:/Users/dotieno/Documents/Data Science Course/Module III/Linear Models/cal_housing.data", header = FALSE)  # Assuming no header row
+data <- read.csv("D:/Module 3/Linear Models/California Housing Price project/cal_housing.data", header = FALSE) # Assuming no header row
 
 
 
@@ -57,7 +69,13 @@ colnames(data) <- c("longitude", "latitude", "housing_median_age",
                     "total_rooms", "total_bedrooms", "population", 
 
                     "households", "median_income", "median_house_value")
+
+cat("Dimensions:", dim(data), "\n")
+cat("Missing values:", sum(is.na(data)), "\n")
+head(data)
 ```
+
+
 
 # 2. Exploratory Data Analysis
 
@@ -65,8 +83,10 @@ colnames(data) <- c("longitude", "latitude", "housing_median_age",
 summary(data)
 ```
 
-```{r eda-distributions}
-data_long <- data %>%
+
+
+```{r eda-distributions for numeric columns}
+data_long <- data %>% 
   select(-c(longitude,latitude)) %>%
   pivot_longer(everything(), names_to = "variable", values_to = "value")
 
@@ -78,6 +98,10 @@ ggplot(data_long, aes(x = value)) +
   labs(title = "Distribution of All Variables")
 ```
 
+- The numeric features are normally distributed but skewed to the right.
+
+
+
 ```{r eda-correlation}
 cor_matrix <- cor(data, use = "complete.obs")
 corrplot(cor_matrix, method = "color", type = "upper",
@@ -85,16 +109,91 @@ corrplot(cor_matrix, method = "color", type = "upper",
          title = "Correlation Matrix", mar = c(0,0,1,0))
 ```
 
+- There is a very high correlation between total bedrooms, population, households and total rooms. Median income has a high correlation with median house value.
+
+```{r eda-geo-map}
+ggplot(data, aes(x = longitude, y = latitude, color = median_house_value)) +
+  geom_point(alpha = 0.3, size = 0.8) +
+  scale_color_viridis(name = "House Value ($)", labels = scales::comma) +
+  theme_minimal() +
+  labs(title = "Geographic Distribution of House Values",
+       x = "Longitude", y = "Latitude")
+```
+
+-Expensive neighborhoods tend to be geographically grouped together. Additionally, expensive neighborhoods are on the western part of California near the ocean while cheaper houses are located towards the inland side.
+
+
+
+```{r eda income vs location}
+spatial_object <- st_as_sf(data, coords = c("longitude", "latitude"), crs = 4326)
+
+# create the nearest neighbour
+coordinates <- st_coordinates(spatial_object)
+knn <- knearneigh(coordinates, k =5)
+neighbour <- knn2nb(knn)
+
+# spartial weights
+lw <- nb2listw(neighbour, style = "W")
+
+# Moran's 1 test for median income
+moran_test <- moran.test(data$median_income, lw)
+print(moran_test)
+
+
+# Moran Scatter plot
+moran.plot(data$median_income, lw, labels = FALSE, main = "Spatial Correlation of Median Income")
+```
+
+- The correlation between location and median income is moderately positively correlated with a value of 0.5963337.
+
 
 
 ```{r}
-dependent <- "median_house_value"
-explanatory <- data %>%
-  select(-c(dependent, longitude, latitude)) %>%
-  names
+spatial_object2 <- st_as_sf(data, coords = c("longitude", "latitude"), crs = 4326)
 
-finalfit::ff_plot(data, dependent, explanatory)
+# create the nearest neighbour
+coordinates <- st_coordinates(spatial_object2)
+knn <- knearneigh(coordinates, k =5)
+neighbour <- knn2nb(knn)
+
+# spartial weights
+lw <- nb2listw(neighbour, style = "W")
+
+# Moran's 1 test for median income
+moran_test <- moran.test(data$median_house_value, lw)
+print(moran_test)
+
+
+# Moran Scatter plot
+moran.plot(data$median_house_value, lw, labels = FALSE, main = "Spatial Correlation of Median House Value")
 ```
+
+
+
+
+
+```{r eda-income-vs-value}
+ggplot(data, aes(x = median_income, y = median_house_value)) +
+  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_smooth(method = "loess", color = "red", se = TRUE) +
+  theme_minimal() +
+  labs(title = "Median Income vs House Value (with Locally Estimated Scatter plot Smoothing)",
+       x = "Median Income", y = "Median House Value ($)")
+```
+
+- The curved smooth line indicates that the relationship between median income and median house value is non-linear. It also reiterates that there is a positive correlation between the median income and median house value.
+
+
+
+```{r Finalfit summary}
+dependent <- "median_house_value"
+explanatory <- data %>% 
+  select(-c(median_house_value, longitude,latitude)) %>% names
+
+data %>%
+  finalfit::ff_plot(dependent, explanatory)
+```
+
 
 ```{r}
 # Create categorical dependent variable
@@ -138,51 +237,47 @@ table1 %>%
 
 
 
-```{r eda-geo-map}
-ggplot(data, aes(x = longitude, y = latitude, color = median_house_value)) +
-  geom_point(alpha = 0.3, size = 0.8) +
-  scale_color_viridis(name = "House Value ($)", labels = scales::comma) +
-  theme_minimal() +
-  labs(title = "Geographic Distribution of House Values",
-       x = "Longitude", y = "Latitude")
-```
-
-```{r eda-income-vs-value}
-ggplot(data, aes(x = median_income, y = median_house_value)) +
-  geom_point(alpha = 0.2, color = "steelblue") +
-  geom_smooth(method = "loess", color = "red", se = TRUE) +
-  theme_minimal() +
-  labs(title = "Median Income vs House Value (with LOESS)",
-       x = "Median Income", y = "Median House Value ($)")
-```
-
 # 3. Feature Engineering & Preprocessing
 
-```{r preprocessing}
-# Remove rows with missing values
-data_clean <- data %>% drop_na()
 
+```{r preprocessing}
 # Engineer derived features
-data_clean <- data_clean %>%
+data_clean <- data %>%
   mutate(
     rooms_per_household    = total_rooms / households,
     bedrooms_per_room      = total_bedrooms / total_rooms,
-    population_per_household = population / households,
-    income_location        = median_income * latitude,   # interaction term
-    log_house_value        = log(median_house_value)
+    population_per_household = population / households
   )
 
 cat("Clean dataset dimensions:", dim(data_clean), "\n")
 ```
 
+```{r scaling}
+numeric <- data_clean %>%
+  select(where(is.numeric)) %>%
+  select(-c(longitude, latitude))
+
+scaled_numeric <- numeric %>%
+  scale(center = TRUE, scale = TRUE) %>%
+  as.data.frame()
+```
+
+
+
+```{r}
+head(scaled_numeric)
+```
+
+
+
 ```{r train-test-split}
 set.seed(42)
-train_idx <- createDataPartition(data_clean$median_house_value, p = 0.8, list = FALSE)
-train_data <- data_clean[train_idx, ]
-test_data  <- data_clean[-train_idx, ]
+train_idx <- createDataPartition(scaled_numeric$median_house_value, p = 0.8, list = FALSE)
+train_data <- scaled_numeric[train_idx, ]
+test_data  <- scaled_numeric[-train_idx, ]
 
 # Feature matrix (exclude target and log-target)
-features <- c("longitude", "latitude", "housing_median_age", "total_rooms",
+features <- c("housing_median_age", "total_rooms",
               "total_bedrooms", "population", "households", "median_income",
               "rooms_per_household", "bedrooms_per_room", "population_per_household")
 
@@ -193,6 +288,9 @@ y_test  <- test_data$median_house_value
 
 cat("Train size:", nrow(X_train), "| Test size:", nrow(X_test), "\n")
 ```
+
+
+
 
 # 4. Model 1 — Parametric Linear Regression (Baseline)
 
@@ -207,6 +305,8 @@ lm_r2    <- cor(y_test, lm_pred)^2
 
 cat("\nLinear Regression — RMSE:", round(lm_rmse, 2), "| R²:", round(lm_r2, 4), "\n")
 ```
+
+
 
 # 5. Model 2 — Polynomial / Spline Regression (GNPR)
 
@@ -229,6 +329,10 @@ spline_r2   <- cor(y_test, spline_pred)^2
 
 cat("Spline Regression — RMSE:", round(spline_rmse, 2), "| R²:", round(spline_r2, 4), "\n")
 ```
+
+
+
+
 
 # 6. Model 3 — Generalized Additive Model (GAM)
 
@@ -256,12 +360,17 @@ gam_r2   <- cor(y_test, gam_pred)^2
 cat("GAM — RMSE:", round(gam_rmse, 2), "| R²:", round(gam_r2, 4), "\n")
 ```
 
+
+
+
 ```{r gam-plots}
 par(mfrow = c(2, 3))
 plot(gam_model, pages = 0, shade = TRUE, col = "steelblue",
      main = "GAM Smooth Terms")
 par(mfrow = c(1, 1))
 ```
+
+
 
 # 7. Model 4 — Random Forest
 
@@ -280,6 +389,9 @@ rf_r2   <- cor(y_test, rf_pred)^2
 cat("Random Forest — RMSE:", round(rf_rmse, 2), "| R²:", round(rf_r2, 4), "\n")
 ```
 
+
+
+
 ```{r rf-importance}
 importance_df <- as.data.frame(importance(rf_model)) %>%
   rownames_to_column("Feature") %>%
@@ -292,6 +404,9 @@ ggplot(importance_df, aes(x = reorder(Feature, `%IncMSE`), y = `%IncMSE`)) +
   labs(title = "Random Forest — Variable Importance (%IncMSE)",
        x = "Feature", y = "% Increase in MSE")
 ```
+
+
+
 
 # 8. Model 5 — XGBoost
 
@@ -325,11 +440,17 @@ xgb_r2   <- cor(y_test, xgb_pred)^2
 cat("XGBoost — RMSE:", round(xgb_rmse, 2), "| R²:", round(xgb_r2, 4), "\n")
 ```
 
+
+
+
 ```{r xgb-importance}
 xgb_imp <- xgb.importance(feature_names = features, model = xgb_model)
 xgb.plot.importance(xgb_imp, top_n = 11,
                     main = "XGBoost Feature Importance")
 ```
+
+
+
 
 # 9. Model 6 — Neural Network
 
@@ -349,7 +470,7 @@ set.seed(42)
 nn_model <- neuralnet(
   target ~ .,
   data       = nn_data_train,
-  hidden     = c(1),
+  hidden     = 1,
   linear.output = TRUE,
   stepmax    = 1e6,
   threshold  = 0.05
@@ -362,6 +483,9 @@ nn_r2          <- cor(y_test, nn_pred)^2
 
 cat("Neural Network — RMSE:", round(nn_rmse, 2), "| R²:", round(nn_r2, 4), "\n")
 ```
+
+
+
 
 # 10. Research Question 1: Nonlinear Interactions — Location × Income
 
@@ -382,6 +506,9 @@ ggplot(data_clean, aes(x = median_income, y = median_house_value, color = lat_gr
        x = "Median Income", y = "Median House Value ($)")
 ```
 
+
+
+
 ```{r pdp-income-latitude}
 # Partial Dependence Plot: income × latitude interaction (Random Forest)
 pd_income <- partial(rf_model, pred.var = "median_income",
@@ -398,6 +525,9 @@ p2 <- autoplot(pd_lat, smooth = TRUE) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+
+
+
 ```{r 2d-pdp}
 # 2D PDP: income × latitude
 pd_2d <- partial(rf_model,
@@ -409,6 +539,8 @@ plotPartial(pd_2d, levelplot = TRUE, zlab = "House Value",
             main = "2D PDP: Income × Latitude Interaction (Random Forest)")
 ```
 
+
+
 ```{r gam-interaction-plot}
 # GAM tensor product smooth: income × latitude
 vis.gam(gam_model, view = c("median_income", "latitude"),
@@ -416,6 +548,9 @@ vis.gam(gam_model, view = c("median_income", "latitude"),
         main = "GAM: Income × Latitude Interaction Surface",
         too.far = 0.05)
 ```
+
+
+
 
 # 11. Research Question 2: Model Comparison
 
@@ -431,6 +566,8 @@ results <- tibble(
 print(results)
 ```
 
+
+
 ```{r comparison-plot}
 results_long <- results %>%
   pivot_longer(c(RMSE, R2), names_to = "Metric", values_to = "Value")
@@ -444,6 +581,9 @@ ggplot(results_long, aes(x = reorder(Model, Value), y = Value, fill = Model)) +
   labs(title = "Model Comparison: RMSE and R²",
        x = "Model", y = "Value")
 ```
+
+
+
 
 ```{r residual-comparison}
 residuals_df <- tibble(
@@ -468,6 +608,8 @@ ggplot(residuals_df, aes(x = Predicted, y = Residual, color = Model)) +
        x = "Predicted Value", y = "Residual")
 ```
 
+
+
 ```{r actual-vs-predicted}
 ggplot(residuals_df, aes(x = Actual, y = Predicted, color = Model)) +
   geom_point(alpha = 0.15, size = 0.5) +
@@ -478,6 +620,9 @@ ggplot(residuals_df, aes(x = Actual, y = Predicted, color = Model)) +
   labs(title = "Actual vs Predicted by Model",
        x = "Actual House Value ($)", y = "Predicted House Value ($)")
 ```
+
+
+
 
 # 12. Summary & Conclusions
 
@@ -499,6 +644,9 @@ cat("   areas show disproportionately higher house values.\n")
 cat("5. GNPR methods (GAM, Splines) substantially improve over linear regression\n")
 cat("   while remaining more interpretable than black-box ML models.\n")
 ```
+
+
+
 
 ```{r session-info}
 sessionInfo()
