@@ -98,7 +98,7 @@ ggplot(data_long, aes(x = value)) +
   labs(title = "Distribution of All Variables")
 ```
 
-- The numeric features are normally distributed but skewed to the right.
+- The numeric features are skewed to the right apart from housing_median_age which is bi-modal.
 
 
 
@@ -120,7 +120,18 @@ ggplot(data, aes(x = longitude, y = latitude, color = median_house_value)) +
        x = "Longitude", y = "Latitude")
 ```
 
--Expensive neighborhoods tend to be geographically grouped together. Additionally, expensive neighborhoods are on the western part of California near the ocean while cheaper houses are located towards the inland side.
+-Expensive neighborhoods tend to be geographically grouped together. Additionally, expensive neighborhoods are on the western part of California near the ocean while cheaper houses are located towards the inland side.Due to urban planning, house prices seems to be regulated to a maximum of \$500001 and a minimum of approximately \$15000.
+
+
+
+```{r}
+ggplot(data, aes(x = longitude, y = latitude, color = median_income)) +
+  geom_point(alpha = 0.3, size = 0.8) +
+  scale_color_viridis(name = "Income Value ($)", labels = scales::comma) +
+  theme_minimal() +
+  labs(title = "Geographic Distribution of Income Values",
+       x = "Longitude", y = "Latitude")
+```
 
 
 
@@ -169,6 +180,7 @@ moran.plot(data$median_house_value, lw, labels = FALSE, main = "Spatial Correlat
 ```
 
 
+- The correlation between location and median house value is highly positively correlated with a value of 0.8136747.
 
 
 
@@ -252,7 +264,7 @@ data_clean <- data %>%
 cat("Clean dataset dimensions:", dim(data_clean), "\n")
 ```
 
-```{r scaling}
+```{r scaling - standardization}
 numeric <- data_clean %>%
   select(where(is.numeric)) %>%
   select(-c(longitude, latitude))
@@ -269,7 +281,6 @@ head(scaled_numeric)
 ```
 
 
-
 ```{r train-test-split}
 set.seed(42)
 train_idx <- createDataPartition(scaled_numeric$median_house_value, p = 0.8, list = FALSE)
@@ -277,8 +288,7 @@ train_data <- scaled_numeric[train_idx, ]
 test_data  <- scaled_numeric[-train_idx, ]
 
 # Feature matrix (exclude target and log-target)
-features <- c("housing_median_age", "total_rooms",
-              "total_bedrooms", "population", "households", "median_income",
+features <- c("housing_median_age", "median_income",
               "rooms_per_household", "bedrooms_per_room", "population_per_household")
 
 X_train <- train_data[, features]
@@ -307,15 +317,75 @@ cat("\nLinear Regression — RMSE:", round(lm_rmse, 2), "| R²:", round(lm_r2, 4
 ```
 
 
+# GNPR models
+# 5. Model 2 — Polynomial Regression
+$$y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \cdots + \beta_d x_i^d + \varepsilon_i$$
 
-# 5. Model 2 — Polynomial / Spline Regression (GNPR)
 
-```{r spline-regression}
+```{r Polynomial Regression}
+# ── 1. Find optimal degree for each predictor via BIC ────────────────────────
+predictors <- c("housing_median_age", "median_income", 
+                "rooms_per_household", "bedrooms_per_room", 
+                "population_per_household")
+
+max_degree <- 5   # maximum degree to test
+
+best_degrees <- sapply(predictors, function(var) {
+  
+  bic_scores <- sapply(1:max_degree, function(deg) {
+    formula <- as.formula(
+      paste("median_house_value ~ poly(", var, ",", deg, ")")
+    )
+    m <- lm(formula, data = train_data)
+    BIC(m)
+  })
+  
+  cat(var, "→ BIC by degree:", round(bic_scores, 1), 
+      "→ Best degree:", which.min(bic_scores), "\n")
+  
+  which.min(bic_scores)   # return degree with lowest BIC
+})
+
+cat("\nSelected degrees:\n")
+print(best_degrees)
+
+# ── 2. Build final model using BIC-selected degrees ──────────────────────────
+poly_terms <- paste0(
+  "poly(", names(best_degrees), ", ", best_degrees, ")",
+  collapse = " + "
+)
+
+final_formula <- as.formula(
+  paste("median_house_value ~", poly_terms)
+)
+
+cat("\nFinal formula:\n")
+print(final_formula)
+
+poly_model <- lm(final_formula, data = train_data)
+
+# ── 3. Evaluate on test set ───────────────────────────────────────────────────
+poly_pred <- predict(poly_model, newdata = test_data)
+poly_rmse <- rmse(y_test, poly_pred)
+poly_r2   <- cor(y_test, poly_pred)^2
+
+cat("\nPolynomial Regression (BIC-optimised degrees)\n")
+cat("RMSE:", round(poly_rmse, 2), "| R²:", round(poly_r2, 4), "\n")
+```
+
+```{r}
+
+```
+
+
+
+
+
+# 6. Model 3 - Regression splines
+```{r Regression splines}
 spline_model <- lm(
   median_house_value ~
     bs(median_income, df = 6) +
-    bs(latitude, df = 6) +
-    bs(longitude, df = 6) +
     bs(housing_median_age, df = 4) +
     bs(rooms_per_household, df = 4) +
     bs(population_per_household, df = 4) +
@@ -331,22 +401,38 @@ cat("Spline Regression — RMSE:", round(spline_rmse, 2), "| R²:", round(spline
 ```
 
 
+# 7. Model 4 - Smoothing splines
+```{r Smoothing splines}
+
+```
+
+
+# 8. Model 5 - Step function
+```{r Step function}
+
+```
+
+
+# 9. Model 6 - Local Regression
+```{r Local Regression}
+
+```
 
 
 
-# 6. Model 3 — Generalized Additive Model (GAM)
+# 10. Model 7 — Generalized Additive Model (GAM)
 
 ```{r gam-model}
 gam_model <- gam(
   median_house_value ~
     s(median_income, k = 10) +
-    s(latitude, k = 10) +
-    s(longitude, k = 10) +
+    #s(latitude, k = 10) +
+    #s(longitude, k = 10) +
     s(housing_median_age, k = 8) +
     s(rooms_per_household, k = 8) +
-    s(population_per_household, k = 8) +
-    ti(latitude, longitude, k = 8) +          # spatial interaction
-    ti(median_income, latitude, k = 6),        # income × location interaction
+    s(population_per_household, k = 8),
+    #ti(latitude, longitude, k = 8) +          # spatial interaction
+    #ti(median_income, latitude, k = 6),        # income × location interaction
   data = train_data,
   method = "REML"
 )
@@ -371,8 +457,8 @@ par(mfrow = c(1, 1))
 ```
 
 
-
-# 7. Model 4 — Random Forest
+# Ensemble models
+# 7. Model 8 — Random Forest
 
 ```{r random-forest}
 set.seed(42)
@@ -408,7 +494,7 @@ ggplot(importance_df, aes(x = reorder(Feature, `%IncMSE`), y = `%IncMSE`)) +
 
 
 
-# 8. Model 5 — XGBoost
+# 8. Model 9 — XGBoost
 
 ```{r xgboost}
 dtrain <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
@@ -452,7 +538,7 @@ xgb.plot.importance(xgb_imp, top_n = 11,
 
 
 
-# 9. Model 6 — Neural Network
+# 9. Model 10 — Neural Network
 
 ```{r neural-net}
 # Scale features for neural network
