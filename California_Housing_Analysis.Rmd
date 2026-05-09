@@ -18,7 +18,7 @@ output:
     number_sections: true
     fig_width: 10
     fig_height: 6
-subtitle: DSA 8305 — Nonparametric Regression Project
+subtitle: Nonparametric Regression Project
 ---
 
 ```{r setup, include=FALSE}
@@ -36,24 +36,16 @@ knitr::opts_chunk$set(
 
 # Introduction & Objectives
 
-This project applies the nonparametric and semi-parametric regression techniques
-covered in **DSA 8305 — Moving Beyond Linearity** to the California Housing
-dataset (20,640 block-group observations from the 1990 US Census). The central
-thesis is that the relationship between housing price and its predictors is
-**inherently nonlinear and spatially interactive** — a claim we test rigorously
-by comparing a full ladder of model families.
+This project applies the nonparametric and semi-parametric regression techniques to the California Housing
+dataset. The central thesis is that the relationship between housing price and its predictors is **inherently nonlinear and spatially interactive**, a claim we test rigorously by comparing a full ladder of model families.
 
 **Research Questions**
 
-1. Can ensemble nonlinear models (Random Forest, XGBoost, Neural Network) predict
-   house prices more accurately than classical approaches? What are the most
-   important nonlinear interactions between location and income?
+1. Can ensemble nonlinear models (Random Forest, XGBoost, Neural Network) predict house prices more accurately than classical approaches? What are the most important nonlinear interactions between location and income?
 
-2. Which model family — **GNPR** (GAM, Kernel/Local Regression, Splines, Step
-   Functions, Polynomial) vs. **Parametric** (Linear, Ridge) vs. **Machine
-   Learning** (RF, XGBoost, NN) — provides the best predictive accuracy?
+2. Which model family — **GNPR** (GAM, Kernel/Local Regression, Splines, Step Functions, Polynomial) vs. **Parametric** (Linear, Ridge) vs. **Machine Learning** (RF, XGBoost, NN) — provides the best predictive accuracy?
 
-**Model Ladder (aligned with lecture notes)**
+**Model Ladder**
 
 | # | Model | Family |
 |---|-------|--------|
@@ -73,7 +65,7 @@ by comparing a full ladder of model families.
 # Package Installation & Loading
 
 ```{r packages}
-# ── Install any missing packages ──────────────────────────────────────────────
+# Install any missing packages
 required_pkgs <- c(
   "tidyverse", "caret", "randomForest", "xgboost",
   "mgcv", "splines", "np", "corrplot", "gridExtra",
@@ -87,7 +79,7 @@ if (length(new_pkgs) > 0) {
   install.packages(new_pkgs, dependencies = TRUE, repos = "https://cloud.r-project.org")
 }
 
-# ── Load libraries ─────────────────────────────────────────────────────────────
+# Load libraries
 suppressPackageStartupMessages({
   library(tidyverse)
   library(caret)
@@ -117,8 +109,6 @@ suppressPackageStartupMessages({
 theme_set(theme_minimal(base_size = 12) +
             theme(plot.title = element_text(face = "bold", size = 13),
                   plot.subtitle = element_text(color = "grey40")))
-
-cat("✓ All packages loaded successfully\n")
 ```
 
 ---
@@ -126,21 +116,19 @@ cat("✓ All packages loaded successfully\n")
 # Data Loading & Initial Inspection
 
 ```{r load-data}
-# ── Load dataset (no header row) ──────────────────────────────────────────────
-data <- read.csv(
-  "D:/Module 3/Linear Models/California Housing Price project/cal_housing.data",
-  header = FALSE
-)
+# Load dataset (no header row) 
+data <- read.csv("D:/Module 3/Linear Models/California Housing Price project/Github/cal_housing.data", header = FALSE)
 
-colnames(data) <- c(
-  "longitude", "latitude", "housing_median_age",
+
+colnames(data) <- c("longitude", "latitude", "housing_median_age",
   "total_rooms", "total_bedrooms", "population",
   "households", "median_income", "median_house_value"
 )
 
+
 cat("Dimensions       :", dim(data), "\n")
 cat("Missing values   :", sum(is.na(data)), "\n")
-cat("Target range ($) :", range(data$median_house_value), "\n")
+
 
 head(data, 6)
 ```
@@ -149,10 +137,7 @@ head(data, 6)
 summary(data)
 ```
 
-> **Note on the target variable:** `median_house_value` is capped at **$500,001**,
-> creating artificial clustering at the ceiling (~4% of observations). This is a
-> known data artefact and will manifest as underprediction in high-value coastal
-> areas for all models.
+
 
 ---
 
@@ -161,21 +146,20 @@ summary(data)
 ## Distributions of All Variables
 
 ```{r eda-distributions, fig.height=8}
-data %>%
-  pivot_longer(everything(), names_to = "variable", values_to = "value") %>%
-  ggplot(aes(x = value)) +
-  geom_histogram(bins = 40, fill = "#2e6da4", color = "white", alpha = 0.85) +
-  facet_wrap(~variable, scales = "free", ncol = 3) +
-  labs(
-    title    = "Distribution of All Variables",
-    subtitle = "Most features are right-skewed; house value is capped at $500,001",
-    x = NULL, y = "Count"
-  )
+data_long <- data %>% 
+  select(-c(longitude,latitude)) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "value")
+
+ggplot(data_long, aes(x = value)) +
+  geom_histogram(bins = 40, fill = "steelblue", color = "white", alpha = 0.8) +
+  #geom_vline(xintercept = median(x)) +
+  facet_wrap(~variable, scales = "free") +
+  theme_minimal() +
+  labs(title = "Distribution of All Variables")
 ```
 
-> Most predictors are **right-skewed** (especially `total_rooms`, `total_bedrooms`,
-> `population`). The heavy right tail and the $500K cap in the target confirm that
-> linear models trained on raw scale will face heteroscedasticity issues.
+- The numeric features are skewed to the right apart from housing_median_age which is bi-modal.
+
 
 ## Correlation Structure
 
@@ -194,13 +178,8 @@ corrplot(
 )
 ```
 
-> **Key observations:**
-> - `median_income` is the strongest predictor of house value (r ≈ 0.69).
-> - `total_rooms`, `total_bedrooms`, `households`, and `population` are highly
->   inter-correlated (~0.9), suggesting multicollinearity — motivating derived
->   per-household ratios in feature engineering.
-> - `latitude` and `longitude` have moderate correlations with house value,
->   reflecting the coastal premium.
+- There is a very high correlation between total bedrooms, population, households and total rooms. Median income has a high correlation with median house value.
+
 
 ## Geographic Distribution
 
@@ -216,10 +195,8 @@ ggplot(data, aes(x = longitude, y = latitude, color = median_house_value / 1e3))
   )
 ```
 
-> The map reveals clear **spatial clustering**: expensive properties concentrate
-> along the Pacific coast, particularly in the Bay Area and greater Los Angeles.
-> The Central Valley interior is substantially cheaper. This spatial autocorrelation
-> violates the i.i.d. assumption of standard linear regression.
+-Expensive neighborhoods tend to be geographically grouped together. Additionally, expensive neighborhoods are on the western part of California near the ocean while cheaper houses are located towards the inland side.Due to urban planning, house prices seems to be regulated to a maximum of \$500001 and a minimum of approximately \$15000.
+
 
 ## Spatial Autocorrelation — Moran's I Test
 
@@ -244,6 +221,11 @@ moran.plot(
 )
 ```
 
+
+
+
+
+
 ```{r moran-value, fig.height=5}
 # Moran's I — house value
 moran_value <- moran.test(data$median_house_value, lw)
@@ -259,10 +241,9 @@ moran.plot(
 )
 ```
 
-> Both Moran's I statistics are **highly significant** (p < 2.2e-16), confirming
-> strong positive spatial autocorrelation in both income and house values. Nearby
-> block-groups tend to have similar values — underpinning why location features
-> (latitude, longitude) are critical predictors.
+- Both Moran's I statistics are **highly significant** (p < 2.2e-16), confirming strong positive spatial autocorrelation in both income and house values. Nearby block-groups tend to have similar values, underpinning why location features (latitude, longitude) are critical predictors.
+
+
 
 ## Nonlinearity: Income vs. House Value
 
@@ -281,27 +262,8 @@ ggplot(data, aes(x = median_income, y = median_house_value / 1e3)) +
   annotate("text", x = 12, y = 200, label = "LOESS fit", color = "#c0392b", size = 3.5)
 ```
 
-> The LOESS smoother reveals a **nonlinear, near-quadratic** relationship — rapid
-> increase from low to moderate incomes, then flattening/saturation above ~$80K
-> income. This is the primary motivation for using polynomial, spline, and GAM
-> models rather than linear regression.
+- The LOESS smoother reveals a **nonlinear** relationship — rapid increase from low to moderate incomes, then flattening/saturation above ~$80K income. This is the primary motivation for using polynomial, spline and GAM models rather than linear regression.
 
-## Pairwise Relationships (Key Variables)
-
-```{r eda-pairs, fig.height=7, fig.width=10}
-data %>%
-  select(median_house_value, median_income, latitude, longitude,
-         housing_median_age) %>%
-  rename(house_value = median_house_value,
-         income      = median_income,
-         age         = housing_median_age) %>%
-  ggpairs(
-    lower = list(continuous = wrap("points", alpha = 0.05, size = 0.4, color = "#2e6da4")),
-    upper = list(continuous = wrap("cor", size = 3.5)),
-    diag  = list(continuous = wrap("densityDiag", fill = "#2e6da4", alpha = 0.5)),
-    title = "Pairwise Relationships — Key Variables"
-  )
-```
 
 ---
 
@@ -332,14 +294,13 @@ set.seed(42)
 
 # Feature names used across all models (excludes lat/lon for scaled versions)
 features_no_geo <- c(
-  "housing_median_age", "total_rooms", "total_bedrooms", "population",
-  "households", "median_income",
+  "housing_median_age", "median_income",
   "rooms_per_household", "bedrooms_per_room", "population_per_household"
 )
 
 features_all <- c("longitude", "latitude", features_no_geo)
 
-# ── Scale ALL numeric features (for parametric & NN models) ───────────────────
+# Scale ALL numeric features (for parametric & NN models) 
 preproc_all <- preProcess(
   data_clean[, features_all],
   method = c("center", "scale")
@@ -347,7 +308,7 @@ preproc_all <- preProcess(
 data_scaled <- predict(preproc_all, data_clean[, features_all])
 data_scaled$median_house_value <- data_clean$median_house_value
 
-# ── Train / test split (80 / 20) ──────────────────────────────────────────────
+# Train / test split (80 / 20) 
 train_idx <- createDataPartition(data_scaled$median_house_value, p = 0.8, list = FALSE)
 
 train_sc  <- data_scaled[ train_idx, ]
@@ -365,8 +326,9 @@ cat("Training set size :", nrow(train_sc), "\n")
 cat("Test set size     :", nrow(test_sc),  "\n")
 ```
 
+
 ```{r helper-functions}
-# ── Unified metrics helper ─────────────────────────────────────────────────────
+# Unified metrics helper 
 calc_metrics <- function(actual, predicted, model_name) {
   rmse_val <- rmse(actual, predicted)
   mae_val  <- mae(actual, predicted)
@@ -386,14 +348,15 @@ all_preds   <- list(Actual = y_test)
 
 ---
 
+
+
 # Model 1 — Multiple Linear Regression (Baseline)
 
 **Theoretical basis:** The standard parametric model assumes:
 
 $$y_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_p x_{ip} + \varepsilon_i$$
 
-This imposes linearity and additivity — a restriction we will systematically
-relax in subsequent models.
+This imposes linearity and additivity, a restriction we will systematically relax in subsequent models.
 
 ```{r lm-model}
 lm_formula <- as.formula(
@@ -404,11 +367,16 @@ lm_model <- lm(lm_formula, data = train_sc)
 summary(lm_model)
 ```
 
+
+
 ```{r lm-diagnostics, fig.height=8}
 par(mfrow = c(2, 2))
 plot(lm_model, pch = 20, cex = 0.4, col = rgb(0.18, 0.42, 0.64, 0.3))
 par(mfrow = c(1, 1))
 ```
+
+
+
 
 ```{r lm-metrics}
 lm_pred <- predict(lm_model, newdata = test_sc)
@@ -420,23 +388,20 @@ cat("Linear Regression — RMSE:", all_metrics$LinearRegression$RMSE,
     "| R²:", all_metrics$LinearRegression$R2, "\n")
 ```
 
-> **Interpretation:** The residual vs. fitted plot shows a clear fan-shaped
-> pattern (heteroscedasticity) and the Q-Q plot reveals heavy tails — both
-> hallmarks of a violated linearity assumption. The R² of ~0.63 leaves 37%
-> of variance unexplained.
+
+
+
+- **Interpretation:** The residual vs. fitted plot shows a clear fan-shaped pattern (heteroscedasticity) and the Q-Q plot reveals heavy tails, both hallmarks of a violated linearity assumption. The R² of ~0.63 leaves 37% of variance unexplained.
 
 ---
 
 # Model 2 — Polynomial Regression (Degree 3) {#polynomial}
 
-**Theoretical basis (DSA 8305, §3):** Polynomial regression extends the linear
-model by raising predictors to powers:
+**Theoretical basis** Polynomial regression extends the linear model by raising predictors to powers:
 
 $$y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \cdots + \beta_d x_i^d + \varepsilon_i$$
 
-We use **degree 3** (cubic) for the two strongest nonlinear predictors
-(`median_income`, `latitude`, `longitude`) and linear terms for the remainder,
-keeping the model estimable without overfitting.
+We use **degree 3** (cubic) for the two strongest nonlinear predictors (`median_income`, `latitude`, `longitude`) and linear terms for the remainder, keeping the model estimable without overfitting.
 
 ```{r poly-model}
 poly_model <- lm(
@@ -446,12 +411,15 @@ poly_model <- lm(
     poly(longitude,     3, raw = FALSE) +
     poly(housing_median_age, 2, raw = FALSE) +
     rooms_per_household + bedrooms_per_room +
-    population_per_household + households,
+    population_per_household,
   data = train_sc
 )
 
 summary(poly_model)
 ```
+
+
+
 
 ```{r poly-plot, fig.height=5}
 # Visualise cubic polynomial fit for median_income (holding other vars at median)
@@ -462,8 +430,7 @@ income_grid <- data.frame(
   housing_median_age       = median(train_sc$housing_median_age),
   rooms_per_household      = median(train_sc$rooms_per_household),
   bedrooms_per_room        = median(train_sc$bedrooms_per_room),
-  population_per_household = median(train_sc$population_per_household),
-  households               = median(train_sc$households)
+  population_per_household = median(train_sc$population_per_household)
 )
 
 income_pred <- predict(poly_model, newdata = income_grid, interval = "confidence")
@@ -486,6 +453,7 @@ ggplot(income_grid, aes(x = income_grid$median_income)) +
   )
 ```
 
+
 ```{r poly-metrics}
 poly_pred <- predict(poly_model, newdata = test_sc)
 
@@ -496,22 +464,20 @@ cat("Polynomial Regression — RMSE:", all_metrics$PolynomialRegression$RMSE,
     "| R²:", all_metrics$PolynomialRegression$R2, "\n")
 ```
 
-> **Interpretation:** Polynomial regression improves over the linear baseline
-> by capturing the concave income-price relationship. However, polynomials impose
-> a **global** structure — they behave erratically near the boundary of the
-> predictor space (Runge's phenomenon), which motivates local methods like splines.
+
+
+
+- **Interpretation:** Polynomial regression improves over the linear baseline by capturing the concave income-price relationship. However, polynomials impose a **global** structure,that is, they behave erratically near the boundary of the predictor space, which motivates local methods like splines.
 
 ---
 
 # Model 3 — Step Function Regression {#step}
 
-**Theoretical basis (DSA 8305, §6–7):** Step functions partition the range of a
-predictor into $K$ bins, fitting a constant in each:
+**Theoretical basis** Step functions partition the range of a predictor into $K$ bins, fitting a constant in each:
 
 $$y_i = \beta_0 + \beta_1 C_1(x_i) + \beta_2 C_2(x_i) + \cdots + \beta_K C_K(x_i) + \varepsilon_i$$
 
-where $C_k(x) = \mathbf{1}(c_{k-1} \le x < c_k)$. Cuts are placed at
-**quartiles** of each predictor.
+where $C_k(x) = \mathbf{1}(c_{k-1} \le x < c_k)$. Cuts are placed at **quartiles** of each predictor.
 
 ```{r step-model}
 # Create step (piecewise-constant) predictors using quartile cut-points
@@ -572,6 +538,7 @@ ggplot(train_step, aes(x = median_income, y = median_house_value)) +
   )
 ```
 
+
 ```{r step-metrics}
 step_pred <- predict(step_model, newdata = test_step)
 
@@ -582,27 +549,23 @@ cat("Step Function — RMSE:", all_metrics$StepFunction$RMSE,
     "| R²:", all_metrics$StepFunction$R2, "\n")
 ```
 
-> **Interpretation:** Step functions are easy to interpret — each coefficient
-> represents the average house value increment in that bin relative to the
-> reference. However, the discontinuities at knot boundaries are unrealistic;
-> house prices do not jump discretely. Splines address this by enforcing
-> continuity.
+
+
+- **Interpretation:** Step functions are easy to interpret — each coefficient represents the average house value increment in that bin relative to the reference. However, the discontinuities at knot boundaries are unrealistic; house prices do not jump discretely. Splines address this by enforcing continuity.
 
 ---
 
 # Model 4 — Regression Splines (B-splines & Natural Splines) {#splines}
 
-**Theoretical basis (DSA 8305, §10–15):** Regression splines fit piecewise
-polynomials with continuity constraints at knots:
+**Theoretical basis** Regression splines fit piecewise polynomials with continuity constraints at knots:
 
 $$y_i = \beta_0 + \sum_{j=1}^{K+3} \beta_j b_j(x_i) + \varepsilon_i$$
 
 A **cubic B-spline** with $K$ knots has $K + 4$ degrees of freedom.
-A **natural spline** adds boundary linearity constraints, reducing instability
-at the tails.
+A **natural spline** adds boundary linearity constraints, reducing instability at the tails.
 
 ```{r spline-model}
-# ── B-spline model ─────────────────────────────────────────────────────────────
+# B-spline model 
 bspline_model <- lm(
   median_house_value ~
     bs(median_income,            df = 6) +   # 6 df ≈ 3 interior knots
@@ -617,7 +580,7 @@ bspline_model <- lm(
 
 bspline_pred <- predict(bspline_model, newdata = test_sc)
 
-# ── Natural spline model ───────────────────────────────────────────────────────
+# Natural spline model 
 nspline_model <- lm(
   median_house_value ~
     ns(median_income,            df = 6) +
@@ -638,6 +601,9 @@ cat("Natural Spline — RMSE:", round(rmse(y_test, nspline_pred), 2),
     "| R²:", round(cor(y_test, nspline_pred)^2, 4), "\n")
 ```
 
+
+
+
 ```{r spline-plot, fig.height=5}
 # Compare linear, B-spline, natural spline fits for median_income
 grid_df <- data.frame(
@@ -647,10 +613,8 @@ grid_df <- data.frame(
   housing_median_age       = median(train_sc$housing_median_age),
   rooms_per_household      = median(train_sc$rooms_per_household),
   bedrooms_per_room        = median(train_sc$bedrooms_per_room),
-  population_per_household = median(train_sc$population_per_household),
-  total_rooms              = median(train_sc$total_rooms),
-  total_bedrooms           = median(train_sc$total_bedrooms),
-  population               = median(train_sc$population)
+  population_per_household = median(train_sc$population_per_household)
+  
 )
 
 grid_df$lm_fit       <- predict(lm_model,      newdata = grid_df %>% mutate(households = median(train_sc$households)))
@@ -683,24 +647,19 @@ all_metrics[["BSpline"]]       <- calc_metrics(y_test, bspline_pred, "4a. B-Spli
 all_metrics[["NaturalSpline"]] <- calc_metrics(y_test, nspline_pred, "4b. Natural Spline Regression")
 ```
 
-> **Interpretation:** Both spline models substantially outperform the linear
-> baseline and the step function. The natural spline is preferred in practice
-> because it imposes linearity at the boundaries, avoiding erratic tail behaviour.
-> Cross-validation (not shown here for brevity) can be used to select the optimal
-> number of degrees of freedom — as discussed in DSA 8305 §16.
+
+
+- **Interpretation:** Both spline models substantially outperform the linear baseline and the step function. The natural spline is preferred in practice because it imposes linearity at the boundaries, avoiding erratic tail behaviour.
 
 ---
 
 # Model 5 — Smoothing Spline (via GAM `s()`) {#smoothing-spline}
 
-**Theoretical basis (DSA 8305, §17–21):** Smoothing splines minimise the penalised
-RSS:
+**Theoretical basis** Smoothing splines minimise the penalised RSS:
 
 $$\sum_{i=1}^{n}(y_i - g(x_i))^2 + \lambda \int g''(t)^2 \, dt$$
 
-The tuning parameter $\lambda$ controls the bias-variance trade-off.
-Large $\lambda$ → smooth $g$; $\lambda \to 0$ → interpolates the data.
-$\lambda$ is selected automatically via **REML** cross-validation when using `mgcv::gam()`.
+The tuning parameter $\lambda$ controls the bias-variance trade-off. Large $\lambda$ → smooth $g$; $\lambda \to 0$ → interpolates the data. $\lambda$ is selected automatically via **REML** cross-validation when using `mgcv::gam()`.
 
 ```{r smoothing-spline}
 # Single-predictor smoothing spline for median_income (illustrative)
@@ -715,6 +674,7 @@ cat("\nEffective df (median_income smooth):",
     round(sum(ss_model_1d$edf), 2), "\n")
 ```
 
+
 ```{r smoothing-spline-plot, fig.height=5}
 # Plot the smoothing spline with uncertainty band
 plot(ss_model_1d, shade = TRUE, col = "#2e6da4", shade.col = "lightblue",
@@ -723,6 +683,8 @@ plot(ss_model_1d, shade = TRUE, col = "#2e6da4", shade.col = "lightblue",
      xlab = "Median Income (scaled)", ylab = "Effect on House Value ($)")
 abline(h = 0, lty = 2, col = "grey50")
 ```
+
+
 
 ```{r smoothing-spline-multi}
 # Multi-predictor smoothing spline model
@@ -756,26 +718,19 @@ plot(ss_multi, pages = 0, shade = TRUE, col = "#c0392b",
 par(mfrow = c(1, 1))
 ```
 
-> **Interpretation:** The smoothing spline for `median_income` reveals a clear
-> S-shaped relationship — steepest around income levels 2–5 (scaled), flattening
-> for very high incomes. The `latitude` smooth shows the bimodal pattern
-> corresponding to the Bay Area and LA. The effective degrees of freedom for each
-> smooth are selected automatically — a major advantage over manually choosing
-> knot placements.
+
+
+- **Interpretation:** The smoothing spline for `median_income` reveals a clear S-shaped relationship, steepest around income levels 2–5 (scaled), flattening for very high incomes. The `latitude` smooth shows the bimodal pattern. The effective degrees of freedom for each smooth are selected automatically, a major advantage over manually choosing knot placements.
 
 ---
 
 # Model 6 — Local Regression (LOESS) {#local-reg}
 
-**Theoretical basis:** Local regression fits weighted least-squares models in a
-moving neighbourhood of each point. The span parameter $\alpha$ controls the
-neighbourhood width — analogous to $\lambda$ in smoothing splines.
+**Theoretical basis:** Local regression fits weighted least-squares models in a moving neighbourhood of each point. The span parameter $\alpha$ controls the neighbourhood width, analogous to $\lambda$ in smoothing splines.
 
 $$\hat{f}(x_0) = \arg\min_{\beta} \sum_{i=1}^{n} K\!\left(\frac{x_i - x_0}{h}\right)(y_i - \beta_0 - \beta_1 x_i)^2$$
 
-For multiple predictors we use **np** (nonparametric) kernel regression with
-bandwidth selected by cross-validation. For speed, we fit LOESS on a sample and
-use a GAM `lo()` approximation for the full model.
+For multiple predictors we use **np** (nonparametric) kernel regression with bandwidth selected by cross-validation. For speed, we fit LOESS on a sample and use a GAM `lo()` approximation for the full model.
 
 ```{r loess-illustrative, fig.height=5}
 # ── Illustrative 1D LOESS: income vs house value ──────────────────────────────
@@ -797,6 +752,9 @@ ggplot(train_sc, aes(x = median_income, y = median_house_value)) +
     x = "Median Income (scaled)", y = "House Value ($)"
   )
 ```
+
+
+
 
 ```{r loess-multivariate}
 # ── Multivariate local regression via GAM lo() ────────────────────────────────
@@ -822,23 +780,17 @@ cat("Local Regression — RMSE:", all_metrics$LocalRegression$RMSE,
     "| R²:", all_metrics$LocalRegression$R2, "\n")
 ```
 
-> **Interpretation:** LOESS is fully nonparametric — it makes no assumption
-> about the global functional form. However, it does not extrapolate well and
-> is computationally expensive. In high dimensions, the curse of dimensionality
-> can degrade its performance. For our 11-predictor problem, GAM provides
-> a more scalable alternative.
+- **Interpretation:** LOESS is fully nonparametric, it makes no assumption about the global functional form. However, it does not extrapolate well and is computationally expensive. For our 11-predictor problem, GAM provides more scalable alternative.
 
 ---
 
 # Model 7 — Generalized Additive Model (GAM) {#gam}
 
-**Theoretical basis (DSA 8305, §22–23):** GAMs replace linear predictors with
-flexible smooth functions while maintaining additivity:
+**Theoretical basis:** GAMs replace linear predictors with flexible smooth functions while maintaining additivity:
 
 $$y_i = \beta_0 + \sum_{j=1}^{p} f_j(x_{ij}) + \varepsilon_i$$
 
-We extend this with **tensor product interaction terms** `ti()` to capture the
-income × location interaction that an additive model would otherwise miss.
+We extend this with **tensor product interaction terms** `ti()` to capture the income × location interaction that an additive model would otherwise miss.
 
 ```{r gam-model}
 gam_model <- mgcv::gam(
@@ -859,6 +811,7 @@ gam_model <- mgcv::gam(
 summary(gam_model)
 ```
 
+
 ```{r gam-smooth-plots, fig.height=12}
 par(mfrow = c(3, 3))
 plot(
@@ -874,6 +827,7 @@ par(mfrow = c(1, 1))
 ```
 
 
+
 ```{r gam-metrics}
 gam_pred <- predict(gam_model, newdata = test_sc)
 
@@ -883,21 +837,15 @@ all_metrics[["GAM"]] <- calc_metrics(y_test, gam_pred, "7. GAM (+ tensor interac
 cat("GAM — RMSE:", all_metrics$GAM$RMSE, "| R²:", all_metrics$GAM$R2, "\n")
 ```
 
-> **Interpretation:** The GAM provides the most interpretable nonlinear model —
-> each smooth term $\hat{f}_j(x_j)$ can be plotted individually to show its
-> contribution to the prediction. The `ti(median_income, latitude)` tensor term
-> reveals that the income premium on house values is **steepest in the Bay Area**
-> (lat ≈ 37–38°) — a finding invisible to additive models.
+
+
+- **Interpretation:** The GAM provides the most interpretable nonlinear model, each smooth term $\hat{f}_j(x_j)$ can be plotted individually to show its contribution to the prediction. The `ti(median_income, latitude)` tensor term reveals that the income premium on house values is **steepest in the Bay Area** (lat ≈ 37–38°), a finding invisible to additive models.
 
 ---
 
 # Model 8 — Random Forest {#rf}
 
-Random Forest is an ensemble of decorrelated decision trees trained on bootstrap
-samples. Each tree is grown on a random subset of features (`mtry`), and
-predictions are averaged. It implicitly captures all nonlinearities and
-interactions without explicit specification — analogous to a fully nonparametric
-model.
+Random Forest is an ensemble of decorrelated decision trees trained on bootstrap samples. Each tree is grown on a random subset of features (`mtry`) and predictions are averaged. It implicitly captures all nonlinearities and interactions without explicit specification — analogous to a fully nonparametric model.
 
 ```{r rf-model}
 set.seed(42)
@@ -912,6 +860,8 @@ rf_model <- randomForest(
 
 print(rf_model)
 ```
+
+
 
 ```{r rf-importance-plot, fig.height=5}
 # Variable importance
@@ -928,11 +878,13 @@ ggplot(imp_df, aes(x = reorder(Feature, `%IncMSE`), y = `%IncMSE`)) +
   )
 ```
 
+
+
 ```{r rf-pdp, fig.height=5}
 # Partial Dependence Plots for top 2 features
 pd_income <- partial(rf_model, pred.var = "median_income",
                      train = X_train, grid.resolution = 30)
-pd_lat    <- partial(rf_model, pred.var = "latitude",
+pd_population_per_household    <- partial(rf_model, pred.var = "population_per_household",
                      train = X_train, grid.resolution = 30)
 
 p_income <- autoplot(pd_income, smooth = TRUE) +
@@ -940,11 +892,13 @@ p_income <- autoplot(pd_income, smooth = TRUE) +
   theme_minimal()
 
 p_lat <- autoplot(pd_lat, smooth = TRUE) +
-  labs(title = "PDP: Latitude (RF)", x = "Latitude (scaled)", y = "Fitted Value") +
+  labs(title = "PDP: Population_per_household (RF)", x = "Population_per_household (scaled)", y = "Fitted Value") +
   theme_minimal()
 
 p_income + p_lat
 ```
+
+
 
 
 ```{r rf-metrics}
@@ -957,20 +911,13 @@ cat("Random Forest — RMSE:", all_metrics$RandomForest$RMSE,
     "| R²:", all_metrics$RandomForest$R2, "\n")
 ```
 
-> **Interpretation:** Random Forest ranks `median_income` first (~42% importance),
-> followed by `latitude` and `longitude`. The 2D PDP shows a clear interaction:
-> the income effect on house value is **amplified in northern latitudes** (Bay Area)
-> versus the south (LA) — confirming the spatial income premium is nonlinear and
-> geographically heterogeneous.
+- **Interpretation:** Random Forest ranks `median_income` first (~42% importance), followed by `population per household` and `House median age`. 
 
 ---
 
 # Model 9 — XGBoost {#xgboost}
 
-XGBoost (eXtreme Gradient Boosting) sequentially fits shallow trees to residuals
-using second-order gradient information. L1/L2 regularisation and subsampling
-control overfitting — playing the role of $\lambda$ in the smoothing spline
-penalty framework.
+XGBoost (eXtreme Gradient Boosting) sequentially fits shallow trees to residuals using second-order gradient information. L1/L2 regularisation and subsampling control overfitting — playing the role of $\lambda$ in the smoothing spline penalty framework.
 
 ```{r xgb-model}
 dtrain <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
@@ -1000,6 +947,8 @@ cat("Best iteration:", xgb_model$best_iteration, "\n")
 cat("Best test RMSE:", xgb_model$best_score, "\n")
 ```
 
+
+
 ```{r xgb-importance, fig.height=5}
 xgb_imp <- xgb.importance(feature_names = features_all, model = xgb_model)
 xgb.plot.importance(xgb_imp, top_n = length(features_all),
@@ -1016,20 +965,13 @@ all_metrics[["XGBoost"]] <- calc_metrics(y_test, xgb_pred, "9. XGBoost")
 cat("XGBoost — RMSE:", all_metrics$XGBoost$RMSE,
     "| R²:", all_metrics$XGBoost$R2, "\n")
 ```
-
-> **Interpretation:** XGBoost is the best-performing single model. Its feature
-> importance profile mirrors Random Forest but places greater emphasis on
-> `longitude` — reflecting that the east-west coastal gradient is particularly
-> informative once income is controlled for. The `gain` metric accounts for how
-> much each feature contributes to reducing loss across all splits.
+- **Interpretation:** XGBoost is the best-performing single model. Its feature importance places greater emphasis on `median_income`. The `gain` metric accounts for how much each feature contributes to reducing loss across all splits.
 
 ---
 
 # Model 10 — Neural Network (MLP) {#nn}
 
-A Multilayer Perceptron (MLP) with one hidden layer. Nonlinearity comes from
-the sigmoid activation applied to each hidden unit. Features are normalised to
-[0, 1] and the target scaled to the same range for stable training.
+A Multilayer Perceptron (MLP) with one hidden layer. Nonlinearity comes from the sigmoid activation applied to each hidden unit. Features are normalised to [0, 1] and the target scaled to the same range for stable training.
 
 ```{r nn-model}
 # ── Normalise for neuralnet ────────────────────────────────────────────────────
@@ -1057,6 +999,8 @@ nn_model <- neuralnet(
 cat("Neural network converged:", !is.null(nn_model$result.matrix), "\n")
 ```
 
+
+
 ```{r nn-metrics}
 nn_pred_sc <- predict(nn_model, X_test_nn)[, 1]
 nn_pred    <- nn_pred_sc * (y_max - y_min) + y_min
@@ -1068,15 +1012,11 @@ cat("Neural Network — RMSE:", all_metrics$NeuralNet$RMSE,
     "| R²:", all_metrics$NeuralNet$R2, "\n")
 ```
 
-> **Note:** The `neuralnet` package trains a shallow MLP using backpropagation.
-> For production-grade neural networks (deep architectures, GPU acceleration,
-> dropout regularisation), `keras`/`torch` would be preferred. Even so, the MLP
-> here demonstrates that neural networks can capture nonlinearity without manual
-> feature engineering.
+- **Note:** The `neuralnet` package trains a shallow MLP using backpropagation.For production-grade neural networks (deep architectures, GPU acceleration, dropout regularisation), `keras`/`torch` would be preferred. Even so, the MLP here demonstrates that neural networks can capture nonlinearity without manual feature engineering.
 
 ---
 
-# Research Question 1: Nonlinear Location × Income Interactions {#rq1}
+# Research Question 1: Nonlinear Location × Income Interactions
 
 ## Income Effect by Latitude Region
 
@@ -1100,6 +1040,7 @@ ggplot(data_clean, aes(x = median_income, y = median_house_value / 1e3,
   )
 ```
 
+
 ## Income Effect by Coastal Proximity
 
 ```{r rq1-income-coast, fig.height=6}
@@ -1115,10 +1056,12 @@ ggplot(data_clean, aes(x = median_income, y = median_house_value / 1e3,
 ```
 
 
+
+
 ## Summary of Key Nonlinear Interactions
 
 ```{r rq1-summary}
-cat("=== KEY NONLINEAR INTERACTIONS (RQ1) ===\n\n")
+cat("=== KEY NONLINEAR INTERACTIONS ===\n\n")
 cat("1. INCOME × LATITUDE:\n")
 cat("   - Bay Area (lat ~37–38°): steepest income gradient — every unit income\n")
 cat("     increase yields a disproportionately higher house value premium.\n")
@@ -1141,7 +1084,7 @@ cat("   - Smoothing spline effective df ≈ 3.8 (well above 1 for linear).\n")
 
 ---
 
-# Research Question 2: Model Comparison {#rq2}
+# Research Question 2: Model Comparison
 
 ## Performance Table
 
@@ -1176,6 +1119,8 @@ results_df %>%
   column_spec(4, bold = TRUE)
 ```
 
+
+
 ## RMSE & R² Bar Chart
 
 ```{r comparison-bar, fig.height=6}
@@ -1206,6 +1151,7 @@ p_r2 <- results_df %>%
 
 p_rmse + p_r2
 ```
+
 
 ## Predicted vs. Actual
 
@@ -1239,6 +1185,7 @@ ggplot(preds_df, aes(x = Actual, y = Predicted, color = Model)) +
   )
 ```
 
+
 ## Residual Analysis
 
 ```{r residuals, fig.height=10, fig.width=12}
@@ -1256,6 +1203,8 @@ preds_df %>%
     x = "Predicted Value ($)", y = "Residual ($)"
   )
 ```
+
+
 
 ## Family-Level Summary
 
@@ -1279,62 +1228,10 @@ family_summary %>%
 
 ---
 
-# Summary & Conclusions {#conclusions}
 
-```{r final-summary}
-cat("══════════════════════════════════════════════════════\n")
-cat("  FINAL MODEL PERFORMANCE SUMMARY — DSA 8305 PROJECT \n")
-cat("══════════════════════════════════════════════════════\n\n")
-print(results_df %>% select(Rank, Model, Family, RMSE, R2))
 
-cat("\n── BEST MODEL ──────────────────────────────────────\n")
-cat("Model   :", results_df$Model[1], "\n")
-cat("RMSE    : $", format(results_df$RMSE[1], big.mark = ","), "\n")
-cat("R²      :", results_df$R2[1], "\n")
 
-cat("\n── KEY FINDINGS ─────────────────────────────────────\n\n")
 
-cat("1. RQ1 — Nonlinear Location × Income Interactions:\n")
-cat("   • The income-house value relationship is nonlinear (concave), best\n")
-cat("     captured by smoothing splines (eff. df ≈ 3.8) or GAM s() terms.\n")
-cat("   • The income premium on house values is spatially heterogeneous:\n")
-cat("     steepest in the Bay Area, moderate in LA, near-flat inland.\n")
-cat("   • A GAM with ti(income, latitude) tensor term and Random Forest 2D PDP\n")
-cat("     both confirm this superadditive coastal income effect.\n\n")
 
-cat("2. RQ2 — Model Family Comparison:\n")
-cat("   • ML Ensemble > GNPR > Parametric (by RMSE and R²)\n")
-cat("   • Parametric linear models explain only 62.9% of variance — linearity\n")
-cat("     assumption is clearly violated.\n")
-cat("   • GNPR methods (GAM, Splines, Smoothing Spline) substantially improve\n")
-cat("     over linear (~77–80% R²) while remaining interpretable via smooth plots.\n")
-cat("   • ML ensembles (XGBoost, RF) achieve the best accuracy (~80–84% R²)\n")
-cat("     by automatically capturing all interactions without specification.\n")
-cat("   • The polynomial and step function models offer modest gains over linear,\n")
-cat("     confirming that global polynomial forms and crude binning are\n")
-cat("     insufficient for complex spatial data.\n\n")
 
-cat("3. Lecture Notes Connection (DSA 8305):\n")
-cat("   • The XGBoost regularisation (η, γ, λ) mirrors the smoothing spline λ\n")
-cat("     penalty: large regularisation → smoother, more biased fit.\n")
-cat("   • GAM PDPs (smooth terms) are the multivariate equivalent of the\n")
-cat("     single-predictor smoothing spline plot in §18-20 of the notes.\n")
-cat("   • Step functions confirm the lecture note warning: 'piecewise-constant\n")
-cat("     functions can miss trends' — borne out by their mediocre R².\n")
-cat("   • Natural splines outperform B-splines at the predictor boundaries,\n")
-cat("     consistent with the boundary stability discussion in §15.\n")
-```
 
-## Final Recommendation
-
-```{r recommendation}
-cat("══════════════════════════════════════════════════════\n")
-cat("  RECOMMENDATION\n")
-cat("══════════════════════════════════════════════════════\n\n")
-cat("For PREDICTION ACCURACY    → XGBoost (RMSE ≈ $46K, R² ≈ 0.84)\n")
-cat("For INTERPRETATION + ACCURACY → GAM with tensor interactions\n")
-cat("                              (interpretable smooth terms, R² ≈ 0.79)\n")
-cat("For TEACHING / BASELINE    → Natural Spline Regression\n")
-cat("                              (clear illustration of DSA 8305 concepts)\n")
-cat("Linear Regression alone    → INSUFFICIENT for this dataset.\n")
-```
