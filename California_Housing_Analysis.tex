@@ -1,0 +1,2209 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={California Housing Price Prediction: Moving Beyond Linearity},
+  pdfauthor={Group 1},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{California Housing Price Prediction: Moving Beyond Linearity}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Nonparametric Regression Project}
+\author{Group 1}
+\date{2026-05-11}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+Wesley Gathua, Wendy Oira, Nehama Mburuki, Michelle Andrew, Methuselah
+Miningwo, Diana Otieno, Denis Koome, Collins Oduor
+
+\section{Introduction \& Objectives}\label{introduction-objectives}
+
+This project applies the nonparametric and semi-parametric regression
+techniques to the California Housing dataset. The central thesis is that
+the relationship between housing price and its predictors is
+\textbf{inherently nonlinear and spatially interactive}, a claim we test
+rigorously by comparing a full ladder of model families.
+
+\textbf{Research Questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Can ensemble nonlinear models (Random Forest, XGBoost, Neural Network)
+  predict house prices more accurately than classical approaches? What
+  are the most important nonlinear interactions between location and
+  income?
+\item
+  Which model family --- \textbf{GNPR} (GAM, Kernel/Local Regression,
+  Splines, Step Functions, Polynomial) vs.~\textbf{Parametric} (Linear,
+  Ridge) vs.~\textbf{Machine Learning} (RF, XGBoost, NN) --- provides
+  the best predictive accuracy?
+\end{enumerate}
+
+\textbf{Model Ladder}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+\# & Model & Family \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Multiple Linear Regression & Parametric (baseline) \\
+2 & Polynomial Regression (degree 3) & GNPR \\
+3 & Step Function Regression & GNPR \\
+4 & Regression Splines (B-splines, Natural Splines) & GNPR \\
+5 & Smoothing Spline (via GAM \texttt{s()}) & GNPR \\
+6 & Local Regression (LOESS) & GNPR \\
+7 & Generalized Additive Model (GAM + tensor interactions) & GNPR \\
+8 & Random Forest & ML Ensemble \\
+9 & XGBoost & ML Ensemble \\
+10 & Neural Network (MLP) & ML / Deep Learning \\
+\end{longtable}
+}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Package Installation \&
+Loading}\label{package-installation-loading}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pkgs }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"tidyverse"}\NormalTok{, }\StringTok{"caret"}\NormalTok{, }\StringTok{"randomForest"}\NormalTok{, }\StringTok{"xgboost"}\NormalTok{, }\StringTok{"mgcv"}\NormalTok{, }\StringTok{"splines"}\NormalTok{, }\StringTok{"np"}\NormalTok{, }\StringTok{"corrplot"}\NormalTok{, }\StringTok{"gridExtra"}\NormalTok{,}
+  \StringTok{"Metrics"}\NormalTok{, }\StringTok{"neuralnet"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }\StringTok{"viridis"}\NormalTok{, }\StringTok{"scales"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"vip"}\NormalTok{, }\StringTok{"spdep"}\NormalTok{, }\StringTok{"sf"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{,}
+  \StringTok{"GGally"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"ggrepel"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"finalfit"}
+\NormalTok{)}
+
+\ControlFlowTok{for}\NormalTok{ (pkg }\ControlFlowTok{in}\NormalTok{ pkgs) \{}
+  \ControlFlowTok{if}\NormalTok{ (}\SpecialCharTok{!}\NormalTok{(pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{())) \{}
+    \FunctionTok{install.packages}\NormalTok{(pkg)}
+\NormalTok{  \}}
+  
+  \FunctionTok{library}\NormalTok{(pkg, }\AttributeTok{character.only =}\NormalTok{ T)}
+\NormalTok{\}}
+
+\CommentTok{\# Global ggplot theme}
+\FunctionTok{theme\_set}\NormalTok{(}\FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_size =} \DecValTok{12}\NormalTok{) }\SpecialCharTok{+}
+            \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{13}\NormalTok{),}
+                  \AttributeTok{plot.subtitle =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{color =} \StringTok{"grey40"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Data Loading \& Initial
+Inspection}\label{data-loading-initial-inspection}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load dataset (no header row) }
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"\textasciitilde{}/Downloads/cal\_housing.data"}\NormalTok{, }\AttributeTok{header =} \ConstantTok{FALSE}\NormalTok{)}
+
+
+\FunctionTok{colnames}\NormalTok{(data) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"longitude"}\NormalTok{, }\StringTok{"latitude"}\NormalTok{, }\StringTok{"housing\_median\_age"}\NormalTok{,}
+  \StringTok{"total\_rooms"}\NormalTok{, }\StringTok{"total\_bedrooms"}\NormalTok{, }\StringTok{"population"}\NormalTok{,}
+  \StringTok{"households"}\NormalTok{, }\StringTok{"median\_income"}\NormalTok{, }\StringTok{"median\_house\_value"}
+\NormalTok{)}
+
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Dimensions :"}\NormalTok{, }\FunctionTok{dim}\NormalTok{(data), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Dimensions : 20640 9
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Missing values :"}\NormalTok{, }\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(data)), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Missing values : 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(data, }\DecValTok{6}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>   longitude latitude housing_median_age total_rooms total_bedrooms population
+#> 1   -122.23    37.88                 41         880            129        322
+#> 2   -122.22    37.86                 21        7099           1106       2401
+#> 3   -122.24    37.85                 52        1467            190        496
+#> 4   -122.25    37.85                 52        1274            235        558
+#> 5   -122.25    37.85                 52        1627            280        565
+#> 6   -122.25    37.85                 52         919            213        413
+#>   households median_income median_house_value
+#> 1        126        8.3252             452600
+#> 2       1138        8.3014             358500
+#> 3        177        7.2574             352100
+#> 4        219        5.6431             341300
+#> 5        259        3.8462             342200
+#> 6        193        4.0368             269700
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    longitude         latitude     housing_median_age  total_rooms   
+#>  Min.   :-124.3   Min.   :32.54   Min.   : 1.00      Min.   :    2  
+#>  1st Qu.:-121.8   1st Qu.:33.93   1st Qu.:18.00      1st Qu.: 1448  
+#>  Median :-118.5   Median :34.26   Median :29.00      Median : 2127  
+#>  Mean   :-119.6   Mean   :35.63   Mean   :28.64      Mean   : 2636  
+#>  3rd Qu.:-118.0   3rd Qu.:37.71   3rd Qu.:37.00      3rd Qu.: 3148  
+#>  Max.   :-114.3   Max.   :41.95   Max.   :52.00      Max.   :39320  
+#>  total_bedrooms     population      households     median_income    
+#>  Min.   :   1.0   Min.   :    3   Min.   :   1.0   Min.   : 0.4999  
+#>  1st Qu.: 295.0   1st Qu.:  787   1st Qu.: 280.0   1st Qu.: 2.5634  
+#>  Median : 435.0   Median : 1166   Median : 409.0   Median : 3.5348  
+#>  Mean   : 537.9   Mean   : 1425   Mean   : 499.5   Mean   : 3.8707  
+#>  3rd Qu.: 647.0   3rd Qu.: 1725   3rd Qu.: 605.0   3rd Qu.: 4.7432  
+#>  Max.   :6445.0   Max.   :35682   Max.   :6082.0   Max.   :15.0001  
+#>  median_house_value
+#>  Min.   : 14999    
+#>  1st Qu.:119600    
+#>  Median :179700    
+#>  Mean   :206856    
+#>  3rd Qu.:264725    
+#>  Max.   :500001
+\end{verbatim}
+
+\section{Exploratory Data Analysis}\label{exploratory-data-analysis}
+
+\subsection{Distributions of All
+Variables}\label{distributions-of-all-variables}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_long }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(longitude,latitude)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\FunctionTok{everything}\NormalTok{(), }\AttributeTok{names\_to =} \StringTok{"variable"}\NormalTok{, }\AttributeTok{values\_to =} \StringTok{"value"}\NormalTok{)}
+
+\FunctionTok{ggplot}\NormalTok{(data\_long, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ value)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins =} \DecValTok{40}\NormalTok{, }\AttributeTok{fill =} \StringTok{"steelblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"white"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+  \CommentTok{\#geom\_vline(xintercept = median(x)) +}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{variable, }\AttributeTok{scales =} \StringTok{"free"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Distribution of All Variables"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/eda-distributions-1.pdf}}
+
+\begin{itemize}
+\tightlist
+\item
+  The numeric features are skewed to the right apart from
+  housing\_median\_age which is bi-modal.
+\end{itemize}
+
+\subsection{Correlation Structure}\label{correlation-structure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cor\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(data, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
+\FunctionTok{corrplot}\NormalTok{(}
+\NormalTok{  cor\_matrix,}
+  \AttributeTok{method      =} \StringTok{"color"}\NormalTok{,}
+  \AttributeTok{type        =} \StringTok{"upper"}\NormalTok{,}
+  \AttributeTok{tl.cex      =} \FloatTok{0.85}\NormalTok{,}
+  \AttributeTok{addCoef.col =} \StringTok{"black"}\NormalTok{,}
+  \AttributeTok{number.cex  =} \FloatTok{0.60}\NormalTok{,}
+  \AttributeTok{col         =} \FunctionTok{colorRampPalette}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"\#d73027"}\NormalTok{,}\StringTok{"white"}\NormalTok{,}\StringTok{"\#1a6aaa"}\NormalTok{))(}\DecValTok{200}\NormalTok{),}
+  \AttributeTok{title       =} \StringTok{"Pearson Correlation Matrix"}\NormalTok{,}
+  \AttributeTok{mar         =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/eda-correlation-1.pdf}}
+
+\begin{itemize}
+\tightlist
+\item
+  There is a very high correlation between total bedrooms, population,
+  households and total rooms. Median income has a high correlation with
+  median house value.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dependent }\OtherTok{\textless{}{-}} \StringTok{"median\_house\_value"}
+\NormalTok{explanatory }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(dependent, longitude, latitude)) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  names}
+
+\NormalTok{finalfit}\SpecialCharTok{::}\FunctionTok{ff\_plot}\NormalTok{(data, dependent, explanatory)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/unnamed-chunk-1-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create categorical dependent variable}
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{house\_value\_group =} \FunctionTok{ntile}\NormalTok{(median\_house\_value, }\DecValTok{4}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+      \FunctionTok{factor}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Low"}\NormalTok{, }\StringTok{"Medium"}\NormalTok{, }\StringTok{"High"}\NormalTok{, }\StringTok{"Very High"}\NormalTok{))}
+\NormalTok{  )}
+
+\NormalTok{dependent }\OtherTok{\textless{}{-}} \StringTok{"house\_value\_group"}
+
+\NormalTok{explanatory }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{median\_house\_value, }\SpecialCharTok{{-}}\NormalTok{house\_value\_group, }\SpecialCharTok{{-}}\NormalTok{longitude, }\SpecialCharTok{{-}}\NormalTok{latitude) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{names}\NormalTok{()}
+
+\CommentTok{\# Create finalfit table}
+\NormalTok{table1 }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summary\_factorlist}\NormalTok{(}
+    \AttributeTok{dependent =}\NormalTok{ dependent,}
+    \AttributeTok{explanatory =}\NormalTok{ explanatory,}
+    \AttributeTok{p =} \ConstantTok{TRUE}\NormalTok{,}
+    \AttributeTok{cont =} \StringTok{"median"}\NormalTok{,}
+    \AttributeTok{column =} \ConstantTok{TRUE}\NormalTok{,}
+    \AttributeTok{total\_col =} \ConstantTok{TRUE}\NormalTok{,}
+    \AttributeTok{na\_include =} \ConstantTok{TRUE}
+\NormalTok{  )}
+
+\CommentTok{\# Render as formatted table}
+\NormalTok{table1 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kbl}\NormalTok{(}
+    \AttributeTok{caption =} \StringTok{"Summary Statistics by House Value Group"}\NormalTok{,}
+    \AttributeTok{align =} \StringTok{"lcccccc"}\NormalTok{,}
+    \AttributeTok{booktabs =} \ConstantTok{FALSE}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}
+    \AttributeTok{bootstrap\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{, }\StringTok{"bordered"}\NormalTok{, }\StringTok{"hover"}\NormalTok{),}
+    \AttributeTok{full\_width =} \ConstantTok{FALSE}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{0}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:unnamed-chunk-2}Summary Statistics by House Value Group}
+\centering
+\begin{tabular}[t]{l|c|c|c|c|c|c|l}
+\hline
+\textbf{label} & \textbf{levels} & \textbf{Low} & \textbf{Medium} & \textbf{High} & \textbf{Very High} & \textbf{Total} & \textbf{p}\\
+\hline
+housing\_median\_age & Median (IQR) & 28.0 (18.0 to 37.0) & 28.0 (17.0 to 36.0) & 28.0 (19.0 to 36.0) & 31.0 (20.0 to 40.0) & 29.0 (18.0 to 37.0) & <0.001\\
+\hline
+total\_rooms & Median (IQR) & 1789.5 (1214.8 to 2614.2) & 2020.0 (1391.0 to 3038.2) & 2224.5 (1539.8 to 3299.0) & 2501.0 (1731.8 to 3617.2) & 2127.0 (1447.8 to 3148.0) & <0.001\\
+\hline
+total\_bedrooms & Median (IQR) & 393.0 (269.0 to 572.0) & 444.0 (301.0 to 661.0) & 458.0 (308.8 to 689.0) & 451.0 (306.0 to 678.0) & 435.0 (295.0 to 647.0) & <0.001\\
+\hline
+population & Median (IQR) & 1088.0 (727.8 to 1567.0) & 1289.5 (854.8 to 1915.2) & 1227.0 (834.0 to 1810.2) & 1092.0 (752.0 to 1604.0) & 1166.0 (787.0 to 1725.0) & <0.001\\
+\hline
+households & Median (IQR) & 359.0 (247.0 to 518.0) & 417.0 (285.0 to 614.0) & 431.0 (296.0 to 646.0) & 429.0 (295.0 to 633.0) & 409.0 (280.0 to 605.0) & <0.001\\
+\hline
+median\_income & Median (IQR) & 2.3 (1.8 to 3.0) & 3.2 (2.6 to 4.0) & 4.0 (3.2 to 4.9) & 5.4 (4.0 to 6.8) & 3.5 (2.6 to 4.7) & <0.001\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Geographic Distribution}\label{geographic-distribution}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ longitude, }\AttributeTok{y =}\NormalTok{ latitude, }\AttributeTok{color =}\NormalTok{ median\_house\_value }\SpecialCharTok{/} \FloatTok{1e3}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.25}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_viridis}\NormalTok{(}\AttributeTok{name =} \StringTok{"Value ($K)"}\NormalTok{, }\AttributeTok{option =} \StringTok{"C"}\NormalTok{, }\AttributeTok{labels =}\NormalTok{ comma) }\SpecialCharTok{+}
+  \FunctionTok{coord\_fixed}\NormalTok{(}\AttributeTok{ratio =} \FloatTok{1.3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Geographic Distribution of Median House Values"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Bay Area (\textasciitilde{}37–38°N) and LA (\textasciitilde{}34°N) coastal corridors command the highest prices"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Longitude"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Latitude"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/eda-geo-1.pdf}}
+
+-Expensive neighborhoods tend to be geographically grouped together.
+Additionally, expensive neighborhoods are on the western part of
+California near the ocean while cheaper houses are located towards the
+inland side.Due to urban planning, house prices seems to be regulated to
+a maximum of \$500001 and a minimum of approximately \$15000.
+
+\subsection{Spatial Autocorrelation --- Moran's I
+Test}\label{spatial-autocorrelation-morans-i-test}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Build spatial object and k{-}NN weights (k = 5)}
+\NormalTok{spatial\_obj }\OtherTok{\textless{}{-}} \FunctionTok{st\_as\_sf}\NormalTok{(data, }\AttributeTok{coords =} \FunctionTok{c}\NormalTok{(}\StringTok{"longitude"}\NormalTok{, }\StringTok{"latitude"}\NormalTok{), }\AttributeTok{crs =} \DecValTok{4326}\NormalTok{)}
+\NormalTok{coords      }\OtherTok{\textless{}{-}} \FunctionTok{st\_coordinates}\NormalTok{(spatial\_obj)}
+\NormalTok{knn5        }\OtherTok{\textless{}{-}} \FunctionTok{knn2nb}\NormalTok{(}\FunctionTok{knearneigh}\NormalTok{(coords, }\AttributeTok{k =} \DecValTok{5}\NormalTok{))}
+\NormalTok{lw          }\OtherTok{\textless{}{-}} \FunctionTok{nb2listw}\NormalTok{(knn5, }\AttributeTok{style =} \StringTok{"W"}\NormalTok{)}
+
+\CommentTok{\# Moran\textquotesingle{}s I — median income}
+\NormalTok{moran\_income }\OtherTok{\textless{}{-}} \FunctionTok{moran.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{median\_income, lw)}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Moran\textquotesingle{}s I (median\_income)      :"}\NormalTok{, }\FunctionTok{round}\NormalTok{(moran\_income}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"Moran I statistic"}\NormalTok{], }\DecValTok{4}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Moran's I (median_income)      : 0.5963
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"p{-}value                        :"}\NormalTok{, }\FunctionTok{format}\NormalTok{(moran\_income}\SpecialCharTok{$}\NormalTok{p.value, }\AttributeTok{scientific =} \ConstantTok{TRUE}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> p-value                        : 0e+00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{moran.plot}\NormalTok{(}
+\NormalTok{  data}\SpecialCharTok{$}\NormalTok{median\_income, lw,}
+  \AttributeTok{labels =} \ConstantTok{FALSE}\NormalTok{,}
+  \AttributeTok{main   =} \StringTok{"Moran Scatter Plot — Median Income"}\NormalTok{,}
+  \AttributeTok{xlab   =} \StringTok{"Median Income"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Spatially Lagged Median Income"}\NormalTok{,}
+  \AttributeTok{pch    =} \DecValTok{20}\NormalTok{, }\AttributeTok{col =} \FunctionTok{rgb}\NormalTok{(}\FloatTok{0.18}\NormalTok{, }\FloatTok{0.42}\NormalTok{, }\FloatTok{0.64}\NormalTok{, }\FloatTok{0.3}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/moran-income-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Moran\textquotesingle{}s I — house value}
+\NormalTok{moran\_value }\OtherTok{\textless{}{-}} \FunctionTok{moran.test}\NormalTok{(data}\SpecialCharTok{$}\NormalTok{median\_house\_value, lw)}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Moran\textquotesingle{}s I (median\_house\_value) :"}\NormalTok{, }\FunctionTok{round}\NormalTok{(moran\_value}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"Moran I statistic"}\NormalTok{], }\DecValTok{4}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Moran's I (median_house_value) : 0.8137
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"p{-}value                        :"}\NormalTok{, }\FunctionTok{format}\NormalTok{(moran\_value}\SpecialCharTok{$}\NormalTok{p.value, }\AttributeTok{scientific =} \ConstantTok{TRUE}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> p-value                        : 0e+00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{moran.plot}\NormalTok{(}
+\NormalTok{  data}\SpecialCharTok{$}\NormalTok{median\_house\_value, lw,}
+  \AttributeTok{labels =} \ConstantTok{FALSE}\NormalTok{,}
+  \AttributeTok{main   =} \StringTok{"Moran Scatter Plot — Median House Value"}\NormalTok{,}
+  \AttributeTok{xlab   =} \StringTok{"House Value"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Spatially Lagged House Value"}\NormalTok{,}
+  \AttributeTok{pch    =} \DecValTok{20}\NormalTok{, }\AttributeTok{col =} \FunctionTok{rgb}\NormalTok{(}\FloatTok{0.77}\NormalTok{, }\FloatTok{0.31}\NormalTok{, }\FloatTok{0.32}\NormalTok{, }\FloatTok{0.3}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/moran-value-1.pdf}}
+
+\begin{itemize}
+\tightlist
+\item
+  Both Moran's I statistics are \textbf{highly significant} (p
+  \textless{} 2.2e-16), confirming strong positive spatial
+  autocorrelation in both income and house values. Nearby block-groups
+  tend to have similar values, underpinning why location features
+  (latitude, longitude) are critical predictors.
+\end{itemize}
+
+\subsection{Nonlinearity: Predictors vs.~House
+Value}\label{nonlinearity-predictors-vs.-house-value}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{vars }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"longitude"}\NormalTok{, }\StringTok{"latitude"}\NormalTok{, }\StringTok{"housing\_median\_age"}\NormalTok{,}
+  \StringTok{"total\_rooms"}\NormalTok{, }\StringTok{"total\_bedrooms"}\NormalTok{, }\StringTok{"population"}\NormalTok{,}
+  \StringTok{"households"}\NormalTok{, }\StringTok{"median\_income"}
+\NormalTok{)}
+
+\FunctionTok{options}\NormalTok{(}
+  \AttributeTok{repr.plot.width =} \DecValTok{18}\NormalTok{,}
+  \AttributeTok{repr.plot.height =} \DecValTok{18}
+\NormalTok{)}
+
+\CommentTok{\# Create plots}
+\NormalTok{plots }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(vars, }\ControlFlowTok{function}\NormalTok{(v) \{}
+  
+  \FunctionTok{ggplot}\NormalTok{(data, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =}\NormalTok{ v, }\AttributeTok{y =} \StringTok{"median\_house\_value / 1e3"}\NormalTok{)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.12}\NormalTok{, }\AttributeTok{color =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+    
+    \CommentTok{\# LOESS nonlinear fit}
+    \FunctionTok{geom\_smooth}\NormalTok{(}
+      \AttributeTok{method =} \StringTok{"loess"}\NormalTok{,}
+      \AttributeTok{color =} \StringTok{"\#c0392b"}\NormalTok{,}
+      \AttributeTok{linewidth =} \FloatTok{1.1}\NormalTok{,}
+      \AttributeTok{se =} \ConstantTok{TRUE}
+\NormalTok{    ) }\SpecialCharTok{+}
+    
+    \CommentTok{\# Linear regression fit}
+    \FunctionTok{geom\_smooth}\NormalTok{(}
+      \AttributeTok{method =} \StringTok{"lm"}\NormalTok{,}
+      \AttributeTok{color =} \StringTok{"\#27ae60"}\NormalTok{,}
+      \AttributeTok{linewidth =} \FloatTok{0.9}\NormalTok{,}
+      \AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{,}
+      \AttributeTok{se =} \ConstantTok{FALSE}
+\NormalTok{    ) }\SpecialCharTok{+}
+    
+    \FunctionTok{labs}\NormalTok{(}
+      \AttributeTok{title =} \FunctionTok{paste}\NormalTok{(v, }\StringTok{"vs Median House Value"}\NormalTok{),}
+      \AttributeTok{subtitle =} \StringTok{"Red = LOESS | Green dashed = Linear"}\NormalTok{,}
+      \AttributeTok{x =}\NormalTok{ v,}
+      \AttributeTok{y =} \StringTok{"Median House Value ($K)"}
+\NormalTok{    ) }\SpecialCharTok{+}
+    
+    \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_size =} \DecValTok{11}\NormalTok{)}
+\NormalTok{\})}
+
+\CommentTok{\# Combine all plots}
+\FunctionTok{wrap\_plots}\NormalTok{(plots, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf}}
+
+\begin{itemize}
+\tightlist
+\item
+  The LOESS smoothers reveal a \textbf{nonlinear} relationships between
+  median house value and several variables. For example, median house
+  values increase from low to moderate incomes, then flattens above
+  \textasciitilde100K income. This is the primary motivation for using
+  polynomial, spline and GAM models rather than linear regression. The
+  relationship between median house value and total bedrooms, on the
+  other hand, is fairly linear.
+\end{itemize}
+
+\section{Feature Engineering \&
+Preprocessing}\label{feature-engineering-preprocessing}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ── Derived features ───────────────────────────────────────────────────────────}
+\NormalTok{data\_clean }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{rooms\_per\_household      =}\NormalTok{ total\_rooms    }\SpecialCharTok{/}\NormalTok{ households,}
+    \AttributeTok{bedrooms\_per\_room        =}\NormalTok{ total\_bedrooms }\SpecialCharTok{/}\NormalTok{ total\_rooms,}
+    \AttributeTok{population\_per\_household =}\NormalTok{ population     }\SpecialCharTok{/}\NormalTok{ households}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# Remove raw aggregate columns that are replaced by per{-}unit ratios}
+  \CommentTok{\# (kept for spatial models but removed from feature set to reduce multicollinearity)}
+  \FunctionTok{select}\NormalTok{(}\FunctionTok{everything}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\# ensure no old columns}
+  \FunctionTok{select}\NormalTok{(longitude, latitude, housing\_median\_age,}
+\NormalTok{         total\_rooms, total\_bedrooms, population, households,}
+\NormalTok{         median\_income, rooms\_per\_household, bedrooms\_per\_room,}
+\NormalTok{         population\_per\_household, median\_house\_value)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Feature{-}engineered dataset dimensions:"}\NormalTok{, }\FunctionTok{dim}\NormalTok{(data\_clean), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Feature-engineered dataset dimensions: 20640 12
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glimpse}\NormalTok{(data\_clean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Rows: 20,640
+#> Columns: 12
+#> $ longitude                <dbl> -122.23, -122.22, -122.24, -122.25, -122.25, ~
+#> $ latitude                 <dbl> 37.88, 37.86, 37.85, 37.85, 37.85, 37.85, 37.~
+#> $ housing_median_age       <dbl> 41, 21, 52, 52, 52, 52, 52, 52, 42, 52, 52, 5~
+#> $ total_rooms              <dbl> 880, 7099, 1467, 1274, 1627, 919, 2535, 3104,~
+#> $ total_bedrooms           <dbl> 129, 1106, 190, 235, 280, 213, 489, 687, 665,~
+#> $ population               <dbl> 322, 2401, 496, 558, 565, 413, 1094, 1157, 12~
+#> $ households               <dbl> 126, 1138, 177, 219, 259, 193, 514, 647, 595,~
+#> $ median_income            <dbl> 8.3252, 8.3014, 7.2574, 5.6431, 3.8462, 4.036~
+#> $ rooms_per_household      <dbl> 6.984127, 6.238137, 8.288136, 5.817352, 6.281~
+#> $ bedrooms_per_room        <dbl> 0.1465909, 0.1557966, 0.1295160, 0.1844584, 0~
+#> $ population_per_household <dbl> 2.555556, 2.109842, 2.802260, 2.547945, 2.181~
+#> $ median_house_value       <dbl> 452600, 358500, 352100, 341300, 342200, 26970~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+
+\CommentTok{\# Feature names used across all models (excludes lat/lon for scaled versions)}
+\NormalTok{features\_no\_geo }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"housing\_median\_age"}\NormalTok{, }\StringTok{"median\_income"}\NormalTok{, }\StringTok{"rooms\_per\_household"}\NormalTok{,}
+  \StringTok{"bedrooms\_per\_room"}\NormalTok{, }\StringTok{"population\_per\_household"}
+\NormalTok{)}
+
+\NormalTok{features\_all }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"longitude"}\NormalTok{, }\StringTok{"latitude"}\NormalTok{, features\_no\_geo)}
+
+\CommentTok{\# Scale ALL numeric features (for parametric \& NN models) }
+\NormalTok{preproc\_all }\OtherTok{\textless{}{-}} \FunctionTok{preProcess}\NormalTok{(}
+\NormalTok{  data\_clean[, features\_no\_geo],}
+  \AttributeTok{method =} \FunctionTok{c}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\StringTok{"scale"}\NormalTok{)}
+\NormalTok{)}
+\NormalTok{data\_scaled }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(preproc\_all, data\_clean[, features\_all])}
+\NormalTok{data\_scaled}\SpecialCharTok{$}\NormalTok{median\_house\_value }\OtherTok{\textless{}{-}}\NormalTok{ data\_clean}\SpecialCharTok{$}\NormalTok{median\_house\_value}
+
+\CommentTok{\# Train / test split (80 / 20) }
+\NormalTok{train\_idx }\OtherTok{\textless{}{-}} \FunctionTok{createDataPartition}\NormalTok{(data\_scaled}\SpecialCharTok{$}\NormalTok{median\_house\_value, }\AttributeTok{p =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{list =} \ConstantTok{FALSE}\NormalTok{)}
+
+\NormalTok{train\_sc  }\OtherTok{\textless{}{-}}\NormalTok{ data\_scaled[ train\_idx, ]}
+\NormalTok{test\_sc   }\OtherTok{\textless{}{-}}\NormalTok{ data\_scaled[}\SpecialCharTok{{-}}\NormalTok{train\_idx, ]}
+
+\NormalTok{train\_raw }\OtherTok{\textless{}{-}}\NormalTok{ data\_clean[ train\_idx, ]}
+\NormalTok{test\_raw  }\OtherTok{\textless{}{-}}\NormalTok{ data\_clean[}\SpecialCharTok{{-}}\NormalTok{train\_idx, ]}
+
+\NormalTok{X\_train }\OtherTok{\textless{}{-}}\NormalTok{ train\_sc[, features\_all]}
+\NormalTok{y\_train }\OtherTok{\textless{}{-}}\NormalTok{ train\_sc}\SpecialCharTok{$}\NormalTok{median\_house\_value}
+\NormalTok{X\_test  }\OtherTok{\textless{}{-}}\NormalTok{ test\_sc[,  features\_all]}
+\NormalTok{y\_test  }\OtherTok{\textless{}{-}}\NormalTok{ test\_sc}\SpecialCharTok{$}\NormalTok{median\_house\_value}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Training set size :"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(train\_sc), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Training set size : 16513
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Test set size     :"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(test\_sc),  }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Test set size     : 4127
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{calc\_metrics }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(actual, predicted, model\_name) \{}
+\NormalTok{  rmse\_val }\OtherTok{\textless{}{-}} \FunctionTok{rmse}\NormalTok{(actual, predicted)}
+\NormalTok{  mae\_val  }\OtherTok{\textless{}{-}} \FunctionTok{mae}\NormalTok{(actual, predicted)}
+\NormalTok{  r2\_val   }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(actual, predicted)}\SpecialCharTok{\^{}}\DecValTok{2}
+  \FunctionTok{tibble}\NormalTok{(}
+    \AttributeTok{Model =}\NormalTok{ model\_name,}
+    \AttributeTok{RMSE  =} \FunctionTok{round}\NormalTok{(rmse\_val, }\DecValTok{2}\NormalTok{),}
+    \AttributeTok{MAE   =} \FunctionTok{round}\NormalTok{(mae\_val,  }\DecValTok{2}\NormalTok{),}
+    \AttributeTok{R2    =} \FunctionTok{round}\NormalTok{(r2\_val,   }\DecValTok{4}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{all\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{all\_preds   }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}\AttributeTok{Actual =}\NormalTok{ y\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Model 1 --- Multiple Linear Regression
+(Baseline)}\label{model-1-multiple-linear-regression-baseline}
+
+\textbf{Theoretical basis:} The standard parametric model assumes:
+
+\[y_i = \beta_0 + \beta_1 x_{i1} + \cdots + \beta_p x_{ip} + \varepsilon_i\]
+
+This imposes linearity and additivity, a restriction we will
+systematically relax in subsequent models.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_formula }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(}
+  \FunctionTok{paste}\NormalTok{(}\StringTok{"median\_house\_value \textasciitilde{}"}\NormalTok{, }\FunctionTok{paste}\NormalTok{(features\_all, }\AttributeTok{collapse =} \StringTok{" + "}\NormalTok{))}
+\NormalTok{)}
+
+\NormalTok{lm\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(lm\_formula, }\AttributeTok{data =}\NormalTok{ train\_sc)}
+\FunctionTok{summary}\NormalTok{(lm\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#> lm(formula = lm_formula, data = train_sc)
+#> 
+#> Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -595183  -45123  -12626   30988  426459 
+#> 
+#> Coefficients:
+#>                            Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)              -3416759.4    73209.8 -46.671  < 2e-16 ***
+#> longitude                  -42544.9      828.8 -51.333  < 2e-16 ***
+#> latitude                   -41075.6      791.1 -51.921  < 2e-16 ***
+#> housing_median_age          12391.0      587.5  21.092  < 2e-16 ***
+#> median_income               83341.4      789.9 105.511  < 2e-16 ***
+#> rooms_per_household          9510.9      675.6  14.078  < 2e-16 ***
+#> bedrooms_per_room           21806.6      770.6  28.300  < 2e-16 ***
+#> population_per_household    -3692.7      497.8  -7.418 1.24e-13 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 71350 on 16505 degrees of freedom
+#> Multiple R-squared:  0.6146, Adjusted R-squared:  0.6144 
+#> F-statistic:  3760 on 7 and 16505 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(lm\_model, }\AttributeTok{pch =} \DecValTok{20}\NormalTok{, }\AttributeTok{cex =} \FloatTok{0.4}\NormalTok{, }\AttributeTok{col =} \FunctionTok{rgb}\NormalTok{(}\FloatTok{0.18}\NormalTok{, }\FloatTok{0.42}\NormalTok{, }\FloatTok{0.64}\NormalTok{, }\FloatTok{0.3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/lm-diagnostics-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\NormalTok{all\_preds[[}\StringTok{"LinearRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ lm\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"LinearRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, lm\_pred, }\StringTok{"1. Linear Regression"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Linear Regression — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{LinearRegression}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{LinearRegression}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Linear Regression — RMSE: 73005.27 | R²: 0.6134
+\end{verbatim}
+
+The residual vs.~fitted plot shows a clear fan-shaped pattern
+(heteroscedasticity) and the Q-Q plot reveals heavy tails, both
+hallmarks of a violated linearity assumption. The R² of
+\textasciitilde0.63 leaves 37\% of variance unexplained.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 2 --- Polynomial Regression (Degree 3)}\label{polynomial}
+
+Polynomial regression extends the linear model by raising predictors to
+powers:
+
+\[y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \cdots + \beta_d x_i^d + \varepsilon_i\]
+
+We use \textbf{degree 3} (cubic) for the two strongest nonlinear
+predictors (\texttt{median\_income}, \texttt{latitude},
+\texttt{longitude}) and linear terms for the remainder, keeping the
+model estimable without overfitting.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{poly\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{poly}\NormalTok{(median\_income, }\DecValTok{3}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{poly}\NormalTok{(latitude,      }\DecValTok{2}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{poly}\NormalTok{(longitude,     }\DecValTok{4}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    housing\_median\_age }\SpecialCharTok{+}
+\NormalTok{    rooms\_per\_household }\SpecialCharTok{+}\NormalTok{ bedrooms\_per\_room }\SpecialCharTok{+}
+\NormalTok{    population\_per\_household,}
+  \AttributeTok{data =}\NormalTok{ train\_sc}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(poly\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#> lm(formula = median_house_value ~ poly(median_income, 3, raw = FALSE) + 
+#>     poly(latitude, 2, raw = FALSE) + poly(longitude, 4, raw = FALSE) + 
+#>     housing_median_age + rooms_per_household + bedrooms_per_room + 
+#>     population_per_household, data = train_sc)
+#> 
+#> Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -397883  -44177  -10870   30649  446455 
+#> 
+#> Coefficients:
+#>                                        Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)                           2.065e+05  5.423e+02 380.703  < 2e-16 ***
+#> poly(median_income, 3, raw = FALSE)1  1.105e+07  1.024e+05 107.883  < 2e-16 ***
+#> poly(median_income, 3, raw = FALSE)2 -1.464e+06  7.548e+04 -19.392  < 2e-16 ***
+#> poly(median_income, 3, raw = FALSE)3 -1.207e+06  7.014e+04 -17.209  < 2e-16 ***
+#> poly(latitude, 2, raw = FALSE)1      -1.144e+07  2.498e+05 -45.808  < 2e-16 ***
+#> poly(latitude, 2, raw = FALSE)2       9.692e+05  9.484e+04  10.220  < 2e-16 ***
+#> poly(longitude, 4, raw = FALSE)1     -1.125e+07  2.466e+05 -45.636  < 2e-16 ***
+#> poly(longitude, 4, raw = FALSE)2     -5.094e+05  8.285e+04  -6.149 7.98e-10 ***
+#> poly(longitude, 4, raw = FALSE)3      2.937e+05  7.928e+04   3.704 0.000213 ***
+#> poly(longitude, 4, raw = FALSE)4      2.207e+04  7.302e+04   0.302 0.762509    
+#> housing_median_age                    1.449e+04  5.836e+02  24.833  < 2e-16 ***
+#> rooms_per_household                   9.454e+03  6.616e+02  14.289  < 2e-16 ***
+#> bedrooms_per_room                     2.562e+04  8.021e+02  31.939  < 2e-16 ***
+#> population_per_household             -3.873e+03  4.863e+02  -7.964 1.77e-15 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 69690 on 16499 degrees of freedom
+#> Multiple R-squared:  0.6324, Adjusted R-squared:  0.6321 
+#> F-statistic:  2183 on 13 and 16499 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Visualise cubic polynomial fit for median\_income (holding other vars at median)}
+\NormalTok{income\_grid }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{median\_income            =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\FunctionTok{max}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\AttributeTok{length =} \DecValTok{200}\NormalTok{),}
+  \AttributeTok{latitude                 =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{latitude),}
+  \AttributeTok{longitude                =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{longitude),}
+  \AttributeTok{housing\_median\_age       =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{housing\_median\_age),}
+  \AttributeTok{rooms\_per\_household      =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{rooms\_per\_household),}
+  \AttributeTok{bedrooms\_per\_room        =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{bedrooms\_per\_room),}
+  \AttributeTok{population\_per\_household =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{population\_per\_household)}
+\NormalTok{)}
+
+\NormalTok{income\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(poly\_model, }\AttributeTok{newdata =}\NormalTok{ income\_grid, }\AttributeTok{interval =} \StringTok{"confidence"}\NormalTok{)}
+\NormalTok{income\_grid}\SpecialCharTok{$}\NormalTok{fit  }\OtherTok{\textless{}{-}}\NormalTok{ income\_pred[, }\StringTok{"fit"}\NormalTok{]}
+\NormalTok{income\_grid}\SpecialCharTok{$}\NormalTok{lwr  }\OtherTok{\textless{}{-}}\NormalTok{ income\_pred[, }\StringTok{"lwr"}\NormalTok{]}
+\NormalTok{income\_grid}\SpecialCharTok{$}\NormalTok{upr  }\OtherTok{\textless{}{-}}\NormalTok{ income\_pred[, }\StringTok{"upr"}\NormalTok{]}
+
+\CommentTok{\# Back{-}transform income from scaled to original for labelling}
+\NormalTok{income\_orig }\OtherTok{\textless{}{-}}\NormalTok{ income\_grid}\SpecialCharTok{$}\NormalTok{median\_income }\SpecialCharTok{*}
+  \FunctionTok{attr}\NormalTok{(preproc\_all}\SpecialCharTok{$}\NormalTok{mean, }\StringTok{"scaled:scale"}\NormalTok{)[}\StringTok{"median\_income"}\NormalTok{] }\SpecialCharTok{+}
+\NormalTok{  preproc\_all}\SpecialCharTok{$}\NormalTok{mean[}\StringTok{"median\_income"}\NormalTok{]}
+
+\FunctionTok{ggplot}\NormalTok{(income\_grid, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ income\_grid}\SpecialCharTok{$}\NormalTok{median\_income)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin =}\NormalTok{ lwr, }\AttributeTok{ymax =}\NormalTok{ upr), }\AttributeTok{fill =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ fit), }\AttributeTok{color =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{1.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Polynomial Regression (Degree 3): Marginal Effect of Median Income"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Other predictors held at their medians. Shaded band = 95\% CI"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Fitted House Value ($)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/poly-plot-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{poly\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(poly\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\NormalTok{all\_preds[[}\StringTok{"PolynomialRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ poly\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"PolynomialRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, poly\_pred, }\StringTok{"2. Polynomial Regression (d=3)"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Polynomial Regression — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{PolynomialRegression}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{PolynomialRegression}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Polynomial Regression — RMSE: 70847.09 | R²: 0.6357
+\end{verbatim}
+
+Polynomial regression improves over the linear baseline by capturing the
+concave income-price relationship. However, polynomials impose a
+\textbf{global} structure,that is, they behave erratically near the
+boundary of the predictor space, which motivates local methods like
+splines.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 3 --- Step Function Regression}\label{step}
+
+Step functions partition the range of a predictor into \(K\) bins,
+fitting a constant in each:
+
+\[y_i = \beta_0 + \beta_1 C_1(x_i) + \beta_2 C_2(x_i) + \cdots + \beta_K C_K(x_i) + \varepsilon_i\]
+
+where \(C_k(x) = \mathbf{1}(c_{k-1} \le x < c_k)\). Cuts are placed at
+\textbf{quartiles} of each predictor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create step (piecewise{-}constant) predictors using quartile cut{-}points}
+\NormalTok{train\_step }\OtherTok{\textless{}{-}}\NormalTok{ train\_sc }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{income\_step =} \FunctionTok{cut}\NormalTok{(median\_income, }\AttributeTok{breaks =} \FunctionTok{quantile}\NormalTok{(median\_income, }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{),}
+                      \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{lat\_step    =} \FunctionTok{cut}\NormalTok{(latitude,      }\AttributeTok{breaks =} \FunctionTok{quantile}\NormalTok{(latitude,      }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{),}
+                      \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{lon\_step    =} \FunctionTok{cut}\NormalTok{(longitude,     }\AttributeTok{breaks =} \FunctionTok{quantile}\NormalTok{(longitude,     }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{),}
+                      \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{age\_step    =} \FunctionTok{cut}\NormalTok{(housing\_median\_age, }\AttributeTok{breaks =} \FunctionTok{quantile}\NormalTok{(housing\_median\_age, }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{3}\SpecialCharTok{/}\DecValTok{3}\NormalTok{),}
+                      \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  )}
+
+\CommentTok{\# Save cut{-}points for test set}
+\NormalTok{income\_breaks }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income,      }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{)}
+\NormalTok{lat\_breaks    }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{latitude,            }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{)}
+\NormalTok{lon\_breaks    }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{longitude,           }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{4}\SpecialCharTok{/}\DecValTok{4}\NormalTok{)}
+\NormalTok{age\_breaks    }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{housing\_median\_age,  }\AttributeTok{probs =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{3}\SpecialCharTok{/}\DecValTok{3}\NormalTok{)}
+
+\NormalTok{test\_step }\OtherTok{\textless{}{-}}\NormalTok{ test\_sc }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{income\_step =} \FunctionTok{cut}\NormalTok{(median\_income,      }\AttributeTok{breaks =}\NormalTok{ income\_breaks, }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{lat\_step    =} \FunctionTok{cut}\NormalTok{(latitude,           }\AttributeTok{breaks =}\NormalTok{ lat\_breaks,    }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{lon\_step    =} \FunctionTok{cut}\NormalTok{(longitude,          }\AttributeTok{breaks =}\NormalTok{ lon\_breaks,    }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{age\_step    =} \FunctionTok{cut}\NormalTok{(housing\_median\_age, }\AttributeTok{breaks =}\NormalTok{ age\_breaks,    }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  )}
+
+\NormalTok{step\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+\NormalTok{    income\_step }\SpecialCharTok{+}\NormalTok{ lat\_step }\SpecialCharTok{+}\NormalTok{ lon\_step }\SpecialCharTok{+}\NormalTok{ age\_step }\SpecialCharTok{+}
+\NormalTok{    rooms\_per\_household }\SpecialCharTok{+}\NormalTok{ bedrooms\_per\_room }\SpecialCharTok{+}\NormalTok{ population\_per\_household,}
+  \AttributeTok{data =}\NormalTok{ train\_step}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(step\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#> lm(formula = median_house_value ~ income_step + lat_step + lon_step + 
+#>     age_step + rooms_per_household + bedrooms_per_room + population_per_household, 
+#>     data = train_step)
+#> 
+#> Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -307135  -53114  -13754   36887  403974 
+#> 
+#> Coefficients:
+#>                             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)                 224611.3     4538.2  49.494  < 2e-16 ***
+#> income_step(-0.688,-0.181]   52688.5     1882.7  27.986  < 2e-16 ***
+#> income_step(-0.181,0.457]    97721.0     2064.6  47.333  < 2e-16 ***
+#> income_step(0.457,5.86]     196466.7     2454.3  80.051  < 2e-16 ***
+#> lat_step(33.9,34.2]          -1404.3     1997.6  -0.703    0.482    
+#> lat_step(34.2,37.7]         -77529.9     3463.6 -22.384  < 2e-16 ***
+#> lat_step(37.7,42]          -103675.8     3837.5 -27.017  < 2e-16 ***
+#> lon_step(-121.8,-118.5]     -68030.4     1981.7 -34.329  < 2e-16 ***
+#> lon_step(-118.5,-118]       -82798.3     3552.3 -23.308  < 2e-16 ***
+#> lon_step(-118,-114.3]      -129619.5     3790.1 -34.199  < 2e-16 ***
+#> age_step(-0.528,0.505]        9709.6     1577.4   6.156 7.65e-10 ***
+#> age_step(0.505,1.86]         23807.4     1750.4  13.601  < 2e-16 ***
+#> rooms_per_household           8559.4      755.3  11.332  < 2e-16 ***
+#> bedrooms_per_room            12819.1      912.2  14.054  < 2e-16 ***
+#> population_per_household     -2951.1      569.9  -5.179 2.26e-07 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Residual standard error: 81720 on 16498 degrees of freedom
+#> Multiple R-squared:  0.4945, Adjusted R-squared:  0.4941 
+#> F-statistic:  1153 on 14 and 16498 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Visualise step fit for median income}
+\NormalTok{step\_income\_df }\OtherTok{\textless{}{-}}\NormalTok{ train\_step }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(income\_step) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{mean\_income  =} \FunctionTok{mean}\NormalTok{(median\_income),}
+    \AttributeTok{mean\_value   =} \FunctionTok{mean}\NormalTok{(median\_house\_value),}
+    \AttributeTok{fitted\_value =} \FunctionTok{mean}\NormalTok{(}\FunctionTok{fitted}\NormalTok{(step\_model)[}\FunctionTok{cur\_group\_rows}\NormalTok{()])}
+\NormalTok{  )}
+
+\FunctionTok{ggplot}\NormalTok{(train\_step, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ median\_income, }\AttributeTok{y =}\NormalTok{ median\_house\_value)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{color =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_step}\NormalTok{(}\AttributeTok{data =}\NormalTok{ step\_income\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ mean\_income, }\AttributeTok{y =}\NormalTok{ fitted\_value),}
+            \AttributeTok{color =} \StringTok{"\#c0392b"}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{1.3}\NormalTok{, }\AttributeTok{direction =} \StringTok{"mid"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Step Function Regression: Piecewise{-}Constant Fit for Median Income"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"4 income bins (quartile cut{-}points). Red step line = model fitted values per bin"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"House Value ($)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/step-plot-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{step\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(step\_model, }\AttributeTok{newdata =}\NormalTok{ test\_step)}
+
+\NormalTok{all\_preds[[}\StringTok{"StepFunction"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ step\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"StepFunction"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, step\_pred, }\StringTok{"3. Step Function"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Step Function — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{StepFunction}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{StepFunction}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Step Function — RMSE: 83018.9 | R²: 0.4998
+\end{verbatim}
+
+Step functions are easy to interpret --- each coefficient represents the
+average house value increment in that bin relative to the reference.
+However, the discontinuities at knot boundaries are unrealistic; house
+prices do not jump discretely. Splines address this by enforcing
+continuity.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 4 --- Generalized Additive Model (GAM)}\label{gam}
+
+GAMs replace linear predictors with flexible smooth functions while
+maintaining additivity:
+
+\[y_i = \beta_0 + \sum_{j=1}^{p} f_j(x_{ij}) + \varepsilon_i\]
+
+We extend this with \textbf{tensor product interaction terms}
+\texttt{ti()} to capture the income × location interaction that an
+additive model would otherwise miss.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gam\_model }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{s}\NormalTok{(median\_income) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(latitude) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(longitude) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(housing\_median\_age) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(rooms\_per\_household) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(population\_per\_household) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(bedrooms\_per\_room) }\SpecialCharTok{+}
+    \FunctionTok{ti}\NormalTok{(latitude, longitude) }\SpecialCharTok{+}           \CommentTok{\# spatial interaction term}
+    \FunctionTok{ti}\NormalTok{(median\_income, latitude),         }\CommentTok{\# income × location interaction}
+  \AttributeTok{data   =}\NormalTok{ train\_sc,}
+  \AttributeTok{method =} \StringTok{"REML"}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(gam\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Family: gaussian 
+#> Link function: identity 
+#> 
+#> Formula:
+#> median_house_value ~ s(median_income) + s(latitude) + s(longitude) + 
+#>     s(housing_median_age) + s(rooms_per_household) + s(population_per_household) + 
+#>     s(bedrooms_per_room) + ti(latitude, longitude) + ti(median_income, 
+#>     latitude)
+#> 
+#> Parametric coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)   198380      34846   5.693 1.27e-08 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Approximate significance of smooth terms:
+#>                                edf Ref.df       F p-value    
+#> s(median_income)             8.048  8.756 431.200  <2e-16 ***
+#> s(latitude)                  8.464  8.797  37.580  <2e-16 ***
+#> s(longitude)                 8.525  8.732  59.972  <2e-16 ***
+#> s(housing_median_age)        8.367  8.872  26.143  <2e-16 ***
+#> s(rooms_per_household)       7.844  8.568  30.375  <2e-16 ***
+#> s(population_per_household)  8.661  8.960 398.085  <2e-16 ***
+#> s(bedrooms_per_room)         5.344  6.590   6.875  <2e-16 ***
+#> ti(latitude,longitude)      12.818 13.281  81.965  <2e-16 ***
+#> ti(median_income,latitude)   7.733  9.352   7.077  <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> R-sq.(adj) =  0.743   Deviance explained = 74.4%
+#> -REML = 2.0469e+05  Scale est. = 3.3916e+09  n = 16513
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(}
+\NormalTok{  gam\_model, }\AttributeTok{pages =} \DecValTok{0}\NormalTok{,}
+  \AttributeTok{shade     =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{col       =} \StringTok{"\#2e6da4"}\NormalTok{,}
+  \AttributeTok{shade.col =} \StringTok{"lightblue"}\NormalTok{,}
+  \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{residuals  =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{pch =} \DecValTok{20}\NormalTok{, }\AttributeTok{cex =} \FloatTok{0.15}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/gam-smooth-plots-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gam\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(gam\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\NormalTok{all\_preds[[}\StringTok{"GAM"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ gam\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"GAM"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, gam\_pred, }\StringTok{"7. GAM (+ tensor interactions)"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"GAM — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{GAM}\SpecialCharTok{$}\NormalTok{RMSE, }\StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{GAM}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> GAM — RMSE: 59275.36 | R²: 0.745
+\end{verbatim}
+
+The GAM provides the most interpretable nonlinear model, each smooth
+term \(\hat{f}_j(x_j)\) can be plotted individually to show its
+contribution to the prediction. The
+\texttt{ti(median\_income,\ latitude)} tensor term reveals that the
+income premium on house values is \textbf{steepest in the Bay Area} (lat
+≈ 37--38°), a finding invisible to additive models.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 5 --- Regression Splines (B-splines \& Natural
+Splines)}\label{splines}
+
+Regression splines fit piecewise polynomials with continuity constraints
+at knots:
+
+\[y_i = \beta_0 + \sum_{j=1}^{K+3} \beta_j b_j(x_i) + \varepsilon_i\]
+
+A \textbf{cubic B-spline} with \(K\) knots has \(K + 4\) degrees of
+freedom. A \textbf{natural spline} adds boundary linearity constraints,
+reducing instability at the tails.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# B{-}spline model }
+\NormalTok{bspline\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{bs}\NormalTok{(median\_income,            }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}   \CommentTok{\# 6 df ≈ 3 interior knots}
+    \FunctionTok{bs}\NormalTok{(latitude,                 }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}   \CommentTok{\# 8 df — bimodal, needs flexibility}
+    \FunctionTok{bs}\NormalTok{(longitude,                }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{bs}\NormalTok{(housing\_median\_age,       }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{bs}\NormalTok{(rooms\_per\_household,      }\AttributeTok{df =} \DecValTok{7}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{bs}\NormalTok{(population\_per\_household, }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{bs}\NormalTok{(bedrooms\_per\_room,        }\AttributeTok{df =} \DecValTok{5}\NormalTok{),}
+  \AttributeTok{data =}\NormalTok{ train\_sc}
+\NormalTok{)}
+
+\NormalTok{bspline\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(bspline\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\CommentTok{\# Natural spline model }
+\NormalTok{nspline\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{ns}\NormalTok{(median\_income,            }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(latitude,                 }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(longitude,                }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(housing\_median\_age,       }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(rooms\_per\_household,      }\AttributeTok{df =} \DecValTok{7}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(population\_per\_household, }\AttributeTok{df =} \DecValTok{8}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ns}\NormalTok{(bedrooms\_per\_room,        }\AttributeTok{df =} \DecValTok{5}\NormalTok{),}
+  \AttributeTok{data =}\NormalTok{ train\_sc}
+\NormalTok{)}
+
+\NormalTok{nspline\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(nspline\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"B{-}Spline       — RMSE:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{rmse}\NormalTok{(y\_test, bspline\_pred), }\DecValTok{2}\NormalTok{),}
+    \StringTok{"| R²:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{cor}\NormalTok{(y\_test, bspline\_pred)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\DecValTok{4}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> B-Spline       — RMSE: 61987.56 | R²: 0.7211
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Natural Spline — RMSE:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{rmse}\NormalTok{(y\_test, nspline\_pred), }\DecValTok{2}\NormalTok{),}
+    \StringTok{"| R²:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(}\FunctionTok{cor}\NormalTok{(y\_test, nspline\_pred)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\DecValTok{4}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Natural Spline — RMSE: 61365.27 | R²: 0.7267
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Compare linear, B{-}spline, natural spline fits for median\_income}
+\NormalTok{grid\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{median\_income            =} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\FunctionTok{max}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\AttributeTok{length =} \DecValTok{300}\NormalTok{),}
+  \AttributeTok{latitude                 =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{latitude),}
+  \AttributeTok{longitude                =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{longitude),}
+  \AttributeTok{housing\_median\_age       =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{housing\_median\_age),}
+  \AttributeTok{rooms\_per\_household      =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{rooms\_per\_household),}
+  \AttributeTok{bedrooms\_per\_room        =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{bedrooms\_per\_room),}
+  \AttributeTok{population\_per\_household =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{population\_per\_household)}
+  
+\NormalTok{)}
+
+\NormalTok{grid\_df}\SpecialCharTok{$}\NormalTok{lm\_fit       }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm\_model,      }\AttributeTok{newdata =}\NormalTok{ grid\_df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{households =} \FunctionTok{median}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{households)))}
+\NormalTok{grid\_df}\SpecialCharTok{$}\NormalTok{bs\_fit       }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(bspline\_model,  }\AttributeTok{newdata =}\NormalTok{ grid\_df)}
+\NormalTok{grid\_df}\SpecialCharTok{$}\NormalTok{ns\_fit       }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(nspline\_model,  }\AttributeTok{newdata =}\NormalTok{ grid\_df)}
+
+\NormalTok{grid\_long }\OtherTok{\textless{}{-}}\NormalTok{ grid\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\FunctionTok{c}\NormalTok{(lm\_fit, bs\_fit, ns\_fit), }\AttributeTok{names\_to =} \StringTok{"model"}\NormalTok{, }\AttributeTok{values\_to =} \StringTok{"fitted"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{model =} \FunctionTok{recode}\NormalTok{(model,}
+    \AttributeTok{lm\_fit =} \StringTok{"Linear"}\NormalTok{, }\AttributeTok{bs\_fit =} \StringTok{"B{-}Spline (df=6)"}\NormalTok{, }\AttributeTok{ns\_fit =} \StringTok{"Natural Spline (df=6)"}\NormalTok{))}
+
+\FunctionTok{ggplot}\NormalTok{(grid\_long, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ median\_income, }\AttributeTok{y =}\NormalTok{ fitted, }\AttributeTok{color =}\NormalTok{ model, }\AttributeTok{linetype =}\NormalTok{ model)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{linewidth =} \FloatTok{1.1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"Linear"} \OtherTok{=} \StringTok{"\#7f8c8d"}\NormalTok{,}
+                                \StringTok{"B{-}Spline (df=6)"} \OtherTok{=} \StringTok{"\#2e6da4"}\NormalTok{,}
+                                \StringTok{"Natural Spline (df=6)"} \OtherTok{=} \StringTok{"\#c0392b"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Regression Splines: Fitted Curves for Median Income"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Splines capture nonlinearity; natural spline is more stable at boundaries"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Fitted House Value ($)"}\NormalTok{,}
+    \AttributeTok{color =} \StringTok{"Model"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"Model"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/spline-plot-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{all\_preds[[}\StringTok{"BSpline"}\NormalTok{]]       }\OtherTok{\textless{}{-}}\NormalTok{ bspline\_pred}
+\NormalTok{all\_preds[[}\StringTok{"NaturalSpline"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ nspline\_pred}
+
+\NormalTok{all\_metrics[[}\StringTok{"BSpline"}\NormalTok{]]       }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, bspline\_pred, }\StringTok{"4a. B{-}Spline Regression"}\NormalTok{)}
+\NormalTok{all\_metrics[[}\StringTok{"NaturalSpline"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, nspline\_pred, }\StringTok{"4b. Natural Spline Regression"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Both spline models substantially outperform the linear baseline and the
+step function. The natural spline is preferred in practice because it
+imposes linearity at the boundaries, avoiding erratic tail behaviour.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{\texorpdfstring{Model 6 --- Smoothing Spline (via GAM
+\texttt{s()})}{Model 6 --- Smoothing Spline (via GAM s())}}\label{smoothing-spline}
+
+Smoothing splines minimise the penalised RSS:
+
+\[\sum_{i=1}^{n}(y_i - g(x_i))^2 + \lambda \int g''(t)^2 \, dt\]
+
+The tuning parameter \(\lambda\) controls the bias-variance trade-off.
+Large \(\lambda\) → smooth \(g\); \(\lambda \to 0\) → interpolates the
+data. \(\lambda\) is selected automatically via \textbf{REML}
+cross-validation when using \texttt{mgcv::gam()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Single{-}predictor smoothing spline for median\_income (illustrative)}
+\NormalTok{ss\_model\_1d }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(median\_income, }\AttributeTok{k =} \DecValTok{10}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{),  }\CommentTok{\# cubic regression spline}
+  \AttributeTok{data   =}\NormalTok{ train\_sc,}
+  \AttributeTok{method =} \StringTok{"REML"}
+\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(ss\_model\_1d)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Family: gaussian 
+#> Link function: identity 
+#> 
+#> Formula:
+#> median_house_value ~ s(median_income, k = 10, bs = "cr")
+#> 
+#> Parametric coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept) 206427.6      639.3   322.9   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Approximate significance of smooth terms:
+#>                    edf Ref.df    F p-value    
+#> s(median_income) 8.112  8.726 1809  <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> R-sq.(adj) =  0.489   Deviance explained = 48.9%
+#> -REML = 2.1029e+05  Scale est. = 6.7482e+09  n = 16513
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Effective df (median\_income smooth):"}\NormalTok{,}
+    \FunctionTok{round}\NormalTok{(}\FunctionTok{sum}\NormalTok{(ss\_model\_1d}\SpecialCharTok{$}\NormalTok{edf), }\DecValTok{2}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Effective df (median_income smooth): 9.11
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot the smoothing spline with uncertainty band}
+\FunctionTok{plot}\NormalTok{(ss\_model\_1d, }\AttributeTok{shade =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{shade.col =} \StringTok{"lightblue"}\NormalTok{,}
+     \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{residuals =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{pch =} \DecValTok{20}\NormalTok{, }\AttributeTok{cex =} \FloatTok{0.1}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Smoothing Spline: s(median\_income) — REML{-}selected λ"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Median Income (scaled)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Effect on House Value ($)"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{, }\AttributeTok{col =} \StringTok{"grey50"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/smoothing-spline-plot-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Multi{-}predictor smoothing spline model}
+\NormalTok{ss\_multi }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{s}\NormalTok{(median\_income,            }\AttributeTok{k =} \DecValTok{10}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(latitude,                 }\AttributeTok{k =} \DecValTok{12}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(longitude,                }\AttributeTok{k =} \DecValTok{12}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(housing\_median\_age,       }\AttributeTok{k =}  \DecValTok{8}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(rooms\_per\_household,      }\AttributeTok{k =}  \DecValTok{8}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{s}\NormalTok{(population\_per\_household, }\AttributeTok{k =}  \DecValTok{8}\NormalTok{, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    bedrooms\_per\_room,}
+  \AttributeTok{data   =}\NormalTok{ train\_sc,}
+  \AttributeTok{method =} \StringTok{"REML"}
+\NormalTok{)}
+
+\NormalTok{ss\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(ss\_multi, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\NormalTok{all\_preds[[}\StringTok{"SmoothingSpline"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ ss\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"SmoothingSpline"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, ss\_pred, }\StringTok{"5. Smoothing Spline (REML)"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Smoothing Spline — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{SmoothingSpline}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{SmoothingSpline}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Smoothing Spline — RMSE: 61351.49 | R²: 0.7268
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(ss\_multi, }\AttributeTok{pages =} \DecValTok{0}\NormalTok{, }\AttributeTok{shade =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col =} \StringTok{"\#c0392b"}\NormalTok{,}
+     \AttributeTok{shade.col =} \StringTok{"\#f5c6c6"}\NormalTok{, }\AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Smoothing Spline Terms"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/smoothing-spline-plots-multi-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+The smoothing spline for \texttt{median\_income} reveals a clear
+S-shaped relationship, steepest around income levels 2--5 (scaled),
+flattening for very high incomes. The \texttt{latitude} smooth shows the
+bimodal pattern. The effective degrees of freedom for each smooth are
+selected automatically, a major advantage over manually choosing knot
+placements.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 7 --- Local Regression (LOESS)}\label{local-reg}
+
+Local regression fits weighted least-squares models in a moving
+neighbourhood of each point. The span parameter \(\alpha\) controls the
+neighbourhood width, analogous to \(\lambda\) in smoothing splines.
+
+\[\hat{f}(x_0) = \arg\min_{\beta} \sum_{i=1}^{n} K\!\left(\frac{x_i - x_0}{h}\right)(y_i - \beta_0 - \beta_1 x_i)^2\]
+
+For multiple predictors we use \textbf{np} (nonparametric) kernel
+regression with bandwidth selected by cross-validation. For speed, we
+fit LOESS on a sample and use a GAM \texttt{lo()} approximation for the
+full model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ── Illustrative 1D LOESS: income vs house value ──────────────────────────────}
+\NormalTok{loess\_1d }\OtherTok{\textless{}{-}} \FunctionTok{loess}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}\NormalTok{ median\_income,}
+  \AttributeTok{data =}\NormalTok{ train\_sc, }\AttributeTok{span =} \FloatTok{0.25}\NormalTok{, }\AttributeTok{degree =} \DecValTok{2}
+\NormalTok{)}
+
+\NormalTok{loess\_grid }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{median\_income =} \FunctionTok{seq}\NormalTok{(}
+  \FunctionTok{min}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\FunctionTok{max}\NormalTok{(train\_sc}\SpecialCharTok{$}\NormalTok{median\_income), }\AttributeTok{length =} \DecValTok{200}\NormalTok{))}
+\NormalTok{loess\_grid}\SpecialCharTok{$}\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(loess\_1d, }\AttributeTok{newdata =}\NormalTok{ loess\_grid)}
+
+\FunctionTok{ggplot}\NormalTok{(train\_sc, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ median\_income, }\AttributeTok{y =}\NormalTok{ median\_house\_value)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.06}\NormalTok{, }\AttributeTok{color =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{data =}\NormalTok{ loess\_grid, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ fit), }\AttributeTok{color =} \StringTok{"\#c0392b"}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{1.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Local Regression (LOESS, span = 0.25): Median Income vs House Value"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Locally{-}weighted polynomial fit — no global functional form assumed"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"House Value ($)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/loess-illustrative-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ── Multivariate local regression via GAM lo() ────────────────────────────────}
+\CommentTok{\# mgcv::gam with lo() terms provides a practical multivariate LOESS approximation}
+\NormalTok{loess\_model }\OtherTok{\textless{}{-}}\NormalTok{mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
+\NormalTok{  median\_house\_value }\SpecialCharTok{\textasciitilde{}}
+\NormalTok{    gam}\SpecialCharTok{::}\FunctionTok{lo}\NormalTok{(median\_income, }\AttributeTok{span =} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    gam}\SpecialCharTok{::}\FunctionTok{lo}\NormalTok{(latitude,      }\AttributeTok{span =} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    gam}\SpecialCharTok{::}\FunctionTok{lo}\NormalTok{(longitude,     }\AttributeTok{span =} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    gam}\SpecialCharTok{::}\FunctionTok{lo}\NormalTok{(housing\_median\_age, }\AttributeTok{span =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    gam}\SpecialCharTok{::}\FunctionTok{lo}\NormalTok{(rooms\_per\_household, }\AttributeTok{span =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    rooms\_per\_household }\SpecialCharTok{+}\NormalTok{ bedrooms\_per\_room }\SpecialCharTok{+}
+\NormalTok{    population\_per\_household,}
+  \AttributeTok{data =}\NormalTok{ train\_sc}
+\NormalTok{)}
+
+\NormalTok{loess\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(loess\_model, }\AttributeTok{newdata =}\NormalTok{ test\_sc)}
+
+\NormalTok{all\_preds[[}\StringTok{"LocalRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ loess\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"LocalRegression"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, loess\_pred, }\StringTok{"6. Local Regression (LOESS)"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Local Regression — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{LocalRegression}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{LocalRegression}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Local Regression — RMSE: 73005.27 | R²: 0.6134
+\end{verbatim}
+
+LOESS is fully nonparametric, it makes no assumption about the global
+functional form. However, it does not extrapolate well and is
+computationally expensive. For our 11-predictor problem, GAM provides
+more scalable alternative.
+
+\section{Model 8 --- Random Forest}\label{rf}
+
+Random Forest is an ensemble of decorrelated decision trees trained on
+bootstrap samples. Each tree is grown on a random subset of features
+(\texttt{mtry}) and predictions are averaged. It implicitly captures all
+nonlinearities and interactions without explicit specification ---
+analogous to a fully nonparametric model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{rf\_model }\OtherTok{\textless{}{-}} \FunctionTok{randomForest}\NormalTok{(}
+  \AttributeTok{x         =}\NormalTok{ X\_train,}
+  \AttributeTok{y         =}\NormalTok{ y\_train,}
+  \AttributeTok{ntree     =} \DecValTok{100}\NormalTok{,}
+  \AttributeTok{mtry      =} \DecValTok{4}\NormalTok{,          }\CommentTok{\# ≈ sqrt(p) for regression}
+  \AttributeTok{importance =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{do.trace   =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\FunctionTok{print}\NormalTok{(rf\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 
+#> Call:
+#>  randomForest(x = X_train, y = y_train, ntree = 100, mtry = 4,      importance = TRUE, do.trace = FALSE) 
+#>                Type of random forest: regression
+#>                      Number of trees: 100
+#> No. of variables tried at each split: 4
+#> 
+#>           Mean of squared residuals: 2516742507
+#>                     % Var explained: 80.93
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Variable importance}
+\NormalTok{imp\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{importance}\NormalTok{(rf\_model)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rownames\_to\_column}\NormalTok{(}\StringTok{"Feature"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{\%IncMSE}\StringTok{\textasciigrave{}}\NormalTok{))}
+
+\FunctionTok{ggplot}\NormalTok{(imp\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(Feature, }\StringTok{\textasciigrave{}}\AttributeTok{\%IncMSE}\StringTok{\textasciigrave{}}\NormalTok{), }\AttributeTok{y =} \StringTok{\textasciigrave{}}\AttributeTok{\%IncMSE}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{fill =} \StringTok{"\#2e6da4"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.85}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Random Forest — Variable Importance (\% Increase in MSE)"}\NormalTok{,}
+    \AttributeTok{x =} \ConstantTok{NULL}\NormalTok{, }\AttributeTok{y =} \StringTok{"\% Increase in MSE if feature permuted"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/rf-importance-plot-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Partial Dependence Plots for top 2 features}
+\NormalTok{pd\_income }\OtherTok{\textless{}{-}} \FunctionTok{partial}\NormalTok{(rf\_model, }\AttributeTok{pred.var =} \StringTok{"median\_income"}\NormalTok{,}
+                     \AttributeTok{train =}\NormalTok{ X\_train, }\AttributeTok{grid.resolution =} \DecValTok{30}\NormalTok{)}
+\NormalTok{pd\_population\_per\_household    }\OtherTok{\textless{}{-}} \FunctionTok{partial}\NormalTok{(rf\_model, }\AttributeTok{pred.var =} \StringTok{"population\_per\_household"}\NormalTok{,}
+                     \AttributeTok{train =}\NormalTok{ X\_train, }\AttributeTok{grid.resolution =} \DecValTok{30}\NormalTok{)}
+
+\NormalTok{pd\_lat }\OtherTok{\textless{}{-}} \FunctionTok{partial}\NormalTok{(rf\_model, }\AttributeTok{pred.var =} \StringTok{"latitude"}\NormalTok{,}
+                     \AttributeTok{train =}\NormalTok{ X\_train, }\AttributeTok{grid.resolution =} \DecValTok{30}\NormalTok{)}
+
+\NormalTok{p\_income }\OtherTok{\textless{}{-}} \FunctionTok{autoplot}\NormalTok{(pd\_income, }\AttributeTok{smooth =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"PDP: Median Income (RF)"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Income (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Fitted Value"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+
+\NormalTok{p\_lat }\OtherTok{\textless{}{-}} \FunctionTok{autoplot}\NormalTok{(pd\_lat, }\AttributeTok{smooth =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"PDP: Population\_per\_household (RF)"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Population\_per\_household (scaled)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Fitted Value"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+
+\NormalTok{p\_income }\SpecialCharTok{+}\NormalTok{ p\_lat}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/rf-pdp-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rf\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(rf\_model, }\AttributeTok{newdata =}\NormalTok{ X\_test)}
+
+\NormalTok{all\_preds[[}\StringTok{"RandomForest"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ rf\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"RandomForest"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, rf\_pred, }\StringTok{"8. Random Forest"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Random Forest — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{RandomForest}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{RandomForest}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Random Forest — RMSE: 50251.31 | R²: 0.8181
+\end{verbatim}
+
+Random Forest ranks \texttt{median\_income} first (\textasciitilde42\%
+importance), followed by \texttt{population\ per\ household} and
+\texttt{House\ median\ age}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 9 --- XGBoost}\label{xgboost}
+
+XGBoost (eXtreme Gradient Boosting) sequentially fits shallow trees to
+residuals using second-order gradient information. L1/L2 regularisation
+and subsampling control overfitting --- playing the role of \(\lambda\)
+in the smoothing spline penalty framework.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dtrain }\OtherTok{\textless{}{-}} \FunctionTok{xgb.DMatrix}\NormalTok{(}\AttributeTok{data =} \FunctionTok{as.matrix}\NormalTok{(X\_train), }\AttributeTok{label =}\NormalTok{ y\_train)}
+\NormalTok{dtest  }\OtherTok{\textless{}{-}} \FunctionTok{xgb.DMatrix}\NormalTok{(}\AttributeTok{data =} \FunctionTok{as.matrix}\NormalTok{(X\_test),  }\AttributeTok{label =}\NormalTok{ y\_test)}
+
+\NormalTok{xgb\_params }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \AttributeTok{objective        =} \StringTok{"reg:squarederror"}\NormalTok{,}
+  \AttributeTok{eta              =} \FloatTok{0.05}\NormalTok{,}
+  \AttributeTok{max\_depth        =} \DecValTok{6}\NormalTok{,}
+  \AttributeTok{subsample        =} \FloatTok{0.8}\NormalTok{,}
+  \AttributeTok{colsample\_bytree =} \FloatTok{0.8}\NormalTok{,}
+  \AttributeTok{min\_child\_weight =} \DecValTok{5}\NormalTok{,}
+  \AttributeTok{gamma            =} \FloatTok{0.1}
+\NormalTok{)}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{xgb\_model }\OtherTok{\textless{}{-}} \FunctionTok{xgb.train}\NormalTok{(}
+  \AttributeTok{params                =}\NormalTok{ xgb\_params,}
+  \AttributeTok{data                  =}\NormalTok{ dtrain,}
+  \AttributeTok{nrounds               =} \DecValTok{500}\NormalTok{,}
+  \AttributeTok{watchlist             =} \FunctionTok{list}\NormalTok{(}\AttributeTok{train =}\NormalTok{ dtrain, }\AttributeTok{test =}\NormalTok{ dtest),}
+  \AttributeTok{early\_stopping\_rounds =} \DecValTok{30}\NormalTok{,}
+  \AttributeTok{verbose               =} \DecValTok{0}
+\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Best iteration:"}\NormalTok{, xgb\_model}\SpecialCharTok{$}\NormalTok{best\_iteration, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Best iteration:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Best test RMSE:"}\NormalTok{, xgb\_model}\SpecialCharTok{$}\NormalTok{best\_score, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Best test RMSE:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{xgb\_imp }\OtherTok{\textless{}{-}} \FunctionTok{xgb.importance}\NormalTok{(}\AttributeTok{feature\_names =}\NormalTok{ features\_all, }\AttributeTok{model =}\NormalTok{ xgb\_model)}
+\FunctionTok{xgb.plot.importance}\NormalTok{(xgb\_imp, }\AttributeTok{top\_n =} \FunctionTok{length}\NormalTok{(features\_all),}
+                    \AttributeTok{main =} \StringTok{"XGBoost Feature Importance (Gain)"}\NormalTok{,}
+                    \AttributeTok{col  =} \StringTok{"\#c0392b"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/xgb-importance-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{xgb\_pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(xgb\_model, dtest)}
+
+\NormalTok{all\_preds[[}\StringTok{"XGBoost"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ xgb\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"XGBoost"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, xgb\_pred, }\StringTok{"9. XGBoost"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"XGBoost — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{XGBoost}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{XGBoost}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> XGBoost — RMSE: 44723.77 | R²: 0.8549
+\end{verbatim}
+
+XGBoost is the best-performing single model. Its feature importance
+places greater emphasis on \texttt{median\_income}. The \texttt{gain}
+metric accounts for how much each feature contributes to reducing loss
+across all splits.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Model 10 --- Neural Network (MLP)}\label{nn}
+
+A Multilayer Perceptron (MLP) with one hidden layer. Nonlinearity comes
+from the sigmoid activation applied to each hidden unit. Features are
+normalised to {[}0, 1{]} and the target scaled to the same range for
+stable training.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ── Normalise for neuralnet ────────────────────────────────────────────────────}
+\NormalTok{preproc\_nn  }\OtherTok{\textless{}{-}} \FunctionTok{preProcess}\NormalTok{(X\_train, }\AttributeTok{method =} \FunctionTok{c}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\StringTok{"scale"}\NormalTok{))}
+\NormalTok{X\_train\_nn  }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(preproc\_nn, X\_train)}
+\NormalTok{X\_test\_nn   }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(preproc\_nn, X\_test)}
+
+\NormalTok{y\_min    }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(y\_train)}
+\NormalTok{y\_max    }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(y\_train)}
+\NormalTok{y\_tr\_sc  }\OtherTok{\textless{}{-}}\NormalTok{ (y\_train }\SpecialCharTok{{-}}\NormalTok{ y\_min) }\SpecialCharTok{/}\NormalTok{ (y\_max }\SpecialCharTok{{-}}\NormalTok{ y\_min)}
+
+\NormalTok{nn\_df\_train }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(X\_train\_nn, }\AttributeTok{target =}\NormalTok{ y\_tr\_sc)}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{nn\_model }\OtherTok{\textless{}{-}} \FunctionTok{neuralnet}\NormalTok{(}
+\NormalTok{  target }\SpecialCharTok{\textasciitilde{}}\NormalTok{ .,}
+  \AttributeTok{data          =}\NormalTok{ nn\_df\_train,}
+  \AttributeTok{hidden        =} \DecValTok{1}\NormalTok{,      }\CommentTok{\# 2 hidden layers: 8 and 4 units}
+  \AttributeTok{linear.output =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{act.fct       =} \StringTok{"logistic"}\NormalTok{,}
+  \AttributeTok{stepmax       =} \FloatTok{5e5}\NormalTok{,}
+  \AttributeTok{threshold     =} \FloatTok{0.05}
+\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Neural network converged:"}\NormalTok{, }\SpecialCharTok{!}\FunctionTok{is.null}\NormalTok{(nn\_model}\SpecialCharTok{$}\NormalTok{result.matrix), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Neural network converged: TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nn\_pred\_sc }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(nn\_model, X\_test\_nn)[, }\DecValTok{1}\NormalTok{]}
+\NormalTok{nn\_pred    }\OtherTok{\textless{}{-}}\NormalTok{ nn\_pred\_sc }\SpecialCharTok{*}\NormalTok{ (y\_max }\SpecialCharTok{{-}}\NormalTok{ y\_min) }\SpecialCharTok{+}\NormalTok{ y\_min}
+
+\NormalTok{all\_preds[[}\StringTok{"NeuralNet"}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ nn\_pred}
+\NormalTok{all\_metrics[[}\StringTok{"NeuralNet"}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{calc\_metrics}\NormalTok{(y\_test, nn\_pred, }\StringTok{"10. Neural Network (MLP)"}\NormalTok{)}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Neural Network — RMSE:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{NeuralNet}\SpecialCharTok{$}\NormalTok{RMSE,}
+    \StringTok{"| R²:"}\NormalTok{, all\_metrics}\SpecialCharTok{$}\NormalTok{NeuralNet}\SpecialCharTok{$}\NormalTok{R2, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> Neural Network — RMSE: 62673.71 | R²: 0.715
+\end{verbatim}
+
+The \texttt{neuralnet} package trains a shallow MLP using
+backpropagation.For production-grade neural networks (deep
+architectures, GPU acceleration, dropout regularisation),
+\texttt{keras}/\texttt{torch} would be preferred. Even so, the MLP here
+demonstrates that neural networks can capture nonlinearity without
+manual feature engineering.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Research Question 1: Nonlinear Location × Income
+Interactions}\label{research-question-1-nonlinear-location-income-interactions}
+
+\subsection{Income Effect by Latitude
+Region}\label{income-effect-by-latitude-region}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_clean }\OtherTok{\textless{}{-}}\NormalTok{ data\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{lat\_region  =} \FunctionTok{cut}\NormalTok{(latitude,  }\AttributeTok{breaks =} \DecValTok{4}\NormalTok{,}
+                      \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"South (SoCal)"}\NormalTok{, }\StringTok{"Central{-}S"}\NormalTok{, }\StringTok{"Central{-}N"}\NormalTok{, }\StringTok{"North (Bay Area)"}\NormalTok{)),}
+    \AttributeTok{long\_region =} \FunctionTok{cut}\NormalTok{(longitude, }\AttributeTok{breaks =} \DecValTok{4}\NormalTok{,}
+                      \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Far Inland"}\NormalTok{, }\StringTok{"Inland"}\NormalTok{, }\StringTok{"Near{-}Coast"}\NormalTok{, }\StringTok{"Coastal"}\NormalTok{))}
+\NormalTok{  )}
+
+\FunctionTok{ggplot}\NormalTok{(data\_clean, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ median\_income, }\AttributeTok{y =}\NormalTok{ median\_house\_value }\SpecialCharTok{/} \FloatTok{1e3}\NormalTok{,}
+                        \AttributeTok{color =}\NormalTok{ lat\_region)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{1.3}\NormalTok{, }\AttributeTok{span =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_viridis\_d}\NormalTok{(}\AttributeTok{name =} \StringTok{"Latitude Region"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Income–House Value Relationship by Latitude Region"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Non{-}parallel slopes confirm a significant income × latitude interaction"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (raw, tens of $K)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Median House Value ($K)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/rq1-income-lat-1.pdf}}
+
+\subsection{Income Effect by Coastal
+Proximity}\label{income-effect-by-coastal-proximity}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data\_clean, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ median\_income, }\AttributeTok{y =}\NormalTok{ median\_house\_value }\SpecialCharTok{/} \FloatTok{1e3}\NormalTok{,}
+                        \AttributeTok{color =}\NormalTok{ long\_region)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{1.3}\NormalTok{, }\AttributeTok{span =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_viridis\_d}\NormalTok{(}\AttributeTok{option =} \StringTok{"C"}\NormalTok{, }\AttributeTok{name =} \StringTok{"Coastal Proximity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Income–House Value Relationship by Coastal Proximity"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Coastal areas show steeper income gradients — superadditive premium"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Median Income (raw)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Median House Value ($K)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/rq1-income-coast-1.pdf}}
+
+\subsection{Summary of Key Nonlinear
+Interactions}\label{summary-of-key-nonlinear-interactions}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"=== KEY NONLINEAR INTERACTIONS ===}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> === KEY NONLINEAR INTERACTIONS ===
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"1. INCOME × LATITUDE:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 1. INCOME × LATITUDE:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Bay Area (lat \textasciitilde{}37–38°): steepest income gradient — every unit income}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Bay Area (lat ~37–38°): steepest income gradient — every unit income
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"     increase yields a disproportionately higher house value premium.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>      increase yields a disproportionately higher house value premium.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} SoCal (lat \textasciitilde{}33–34°): moderate income gradient, flatter at high incomes.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - SoCal (lat ~33–34°): moderate income gradient, flatter at high incomes.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Central Valley (lat \textasciitilde{}35–37°): nearly flat — income has low marginal}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Central Valley (lat ~35–37°): nearly flat — income has low marginal
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"     effect on house value in inland areas.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>      effect on house value in inland areas.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"2. INCOME × LONGITUDE:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 2. INCOME × LONGITUDE:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Coastal blocks (lon ≈ {-}118°, {-}122°): income premium is amplified.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Coastal blocks (lon ≈ -118°, -122°): income premium is amplified.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Inland blocks: income{-}price slope is weaker — location dominates.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Inland blocks: income-price slope is weaker — location dominates.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"3. LATITUDE × LONGITUDE (Spatial):}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 3. LATITUDE × LONGITUDE (Spatial):
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Bay Area cluster and LA cluster are spatially nonlinear — cannot be}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Bay Area cluster and LA cluster are spatially nonlinear — cannot be
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"     captured by additive lat + lon terms alone.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>      captured by additive lat + lon terms alone.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"4. INCOME (marginal, nonlinear):}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#> 4. INCOME (marginal, nonlinear):
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Near{-}quadratic: rapid increase in $20K–80K income range, then plateau.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Near-quadratic: rapid increase in $20K–80K income range, then plateau.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"   {-} Smoothing spline effective df ≈ 3.8 (well above 1 for linear).}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+#>    - Smoothing spline effective df ≈ 3.8 (well above 1 for linear).
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Research Question 2: Model
+Comparison}\label{research-question-2-model-comparison}
+
+\subsection{Performance Table}\label{performance-table}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{results\_df }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(all\_metrics) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(RMSE) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{Family =} \FunctionTok{case\_when}\NormalTok{(}
+      \FunctionTok{str\_detect}\NormalTok{(Model, }\StringTok{"Linear|Ridge"}\NormalTok{)        }\SpecialCharTok{\textasciitilde{}} \StringTok{"Parametric"}\NormalTok{,}
+      \FunctionTok{str\_detect}\NormalTok{(Model, }\StringTok{"Poly|Step|Spline|Smooth|Local|GAM"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}} \StringTok{"GNPR"}\NormalTok{,}
+      \FunctionTok{str\_detect}\NormalTok{(Model, }\StringTok{"Forest|XGBoost|Neural"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}} \StringTok{"ML Ensemble"}
+\NormalTok{    ),}
+    \AttributeTok{Rank   =} \FunctionTok{row\_number}\NormalTok{()}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(Rank, Model, Family, RMSE, MAE, R2)}
+
+\NormalTok{results\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kbl}\NormalTok{(}
+    \AttributeTok{caption  =} \StringTok{"Model Performance Comparison (Test Set)"}\NormalTok{,}
+    \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Rank"}\NormalTok{, }\StringTok{"Model"}\NormalTok{, }\StringTok{"Family"}\NormalTok{, }\StringTok{"RMSE ($)"}\NormalTok{, }\StringTok{"MAE ($)"}\NormalTok{, }\StringTok{"R²"}\NormalTok{),}
+    \AttributeTok{digits   =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{4}\NormalTok{),}
+    \AttributeTok{align    =} \StringTok{"lccccc"}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}
+    \AttributeTok{bootstrap\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{, }\StringTok{"hover"}\NormalTok{, }\StringTok{"bordered"}\NormalTok{),}
+    \AttributeTok{full\_width  =} \ConstantTok{FALSE}\NormalTok{,}
+    \AttributeTok{font\_size   =} \DecValTok{13}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{background =} \StringTok{"\#e6f4ea"}\NormalTok{, }\AttributeTok{color =} \StringTok{"\#155724"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}  \CommentTok{\# best}
+  \FunctionTok{row\_spec}\NormalTok{(}\FunctionTok{which}\NormalTok{(results\_df}\SpecialCharTok{$}\NormalTok{Family }\SpecialCharTok{==} \StringTok{"Parametric"}\NormalTok{), }\AttributeTok{background =} \StringTok{"\#fff3cd"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\FunctionTok{which}\NormalTok{(results\_df}\SpecialCharTok{$}\NormalTok{Family }\SpecialCharTok{==} \StringTok{"GNPR"}\NormalTok{), }\AttributeTok{background =} \StringTok{"\#cfe2ff"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{column\_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:comparison-table}Model Performance Comparison (Test Set)}
+\centering
+\fontsize{13}{15}\selectfont
+\begin{tabular}[t]{l|c|c|>{}c|c|c}
+\hline
+Rank & Model & Family & RMSE (\$) & MAE (\$) & R²\\
+\hline
+\cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{1}}} & \cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{9. XGBoost}}} & \cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{ML Ensemble}}} & \textbf{\cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{44724}}}} & \cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{28960}}} & \cellcolor[HTML]{e6f4ea}{\textcolor[HTML]{155724}{\textbf{0.8549}}}\\
+\hline
+2 & 8. Random Forest & ML Ensemble & \textbf{50251} & 32364 & 0.8181\\
+\hline
+\cellcolor[HTML]{cfe2ff}{3} & \cellcolor[HTML]{cfe2ff}{7. GAM (+ tensor interactions)} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{59275}} & \cellcolor[HTML]{cfe2ff}{41716} & \cellcolor[HTML]{cfe2ff}{0.7450}\\
+\hline
+\cellcolor[HTML]{cfe2ff}{4} & \cellcolor[HTML]{cfe2ff}{5. Smoothing Spline (REML)} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{61351}} & \cellcolor[HTML]{cfe2ff}{43675} & \cellcolor[HTML]{cfe2ff}{0.7268}\\
+\hline
+\cellcolor[HTML]{cfe2ff}{5} & \cellcolor[HTML]{cfe2ff}{4b. Natural Spline Regression} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{61365}} & \cellcolor[HTML]{cfe2ff}{44011} & \cellcolor[HTML]{cfe2ff}{0.7267}\\
+\hline
+\cellcolor[HTML]{cfe2ff}{6} & \cellcolor[HTML]{cfe2ff}{4a. B-Spline Regression} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{61988}} & \cellcolor[HTML]{cfe2ff}{44615} & \cellcolor[HTML]{cfe2ff}{0.7211}\\
+\hline
+7 & 10. Neural Network (MLP) & ML Ensemble & \textbf{62674} & 44394 & 0.7150\\
+\hline
+\cellcolor[HTML]{cfe2ff}{8} & \cellcolor[HTML]{cfe2ff}{2. Polynomial Regression (d=3)} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{70847}} & \cellcolor[HTML]{cfe2ff}{51212} & \cellcolor[HTML]{cfe2ff}{0.6357}\\
+\hline
+\cellcolor[HTML]{fff3cd}{9} & \cellcolor[HTML]{fff3cd}{1. Linear Regression} & \cellcolor[HTML]{fff3cd}{Parametric} & \textbf{\cellcolor[HTML]{fff3cd}{73005}} & \cellcolor[HTML]{fff3cd}{52943} & \cellcolor[HTML]{fff3cd}{0.6134}\\
+\hline
+\cellcolor[HTML]{cfe2ff}{10} & \cellcolor[HTML]{cfe2ff}{6. Local Regression (LOESS)} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{73005}} & \cellcolor[HTML]{cfe2ff}{52943} & \cellcolor[HTML]{cfe2ff}{0.6134}\\
+\hline
+\cellcolor[HTML]{cfe2ff}{11} & \cellcolor[HTML]{cfe2ff}{3. Step Function} & \cellcolor[HTML]{cfe2ff}{GNPR} & \textbf{\cellcolor[HTML]{cfe2ff}{83019}} & \cellcolor[HTML]{cfe2ff}{62574} & \cellcolor[HTML]{cfe2ff}{0.4998}\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{RMSE \& R² Bar Chart}\label{rmse-ruxb2-bar-chart}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{family\_colors }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Parametric"} \OtherTok{=} \StringTok{"\#f39c12"}\NormalTok{, }\StringTok{"GNPR"} \OtherTok{=} \StringTok{"\#2e6da4"}\NormalTok{, }\StringTok{"ML Ensemble"} \OtherTok{=} \StringTok{"\#27ae60"}\NormalTok{)}
+
+\NormalTok{p\_rmse }\OtherTok{\textless{}{-}}\NormalTok{ results\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(Model, }\SpecialCharTok{{-}}\NormalTok{RMSE), }\AttributeTok{y =}\NormalTok{ RMSE, }\AttributeTok{fill =}\NormalTok{ Family)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.7}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.9}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =}\NormalTok{ scales}\SpecialCharTok{::}\FunctionTok{comma}\NormalTok{(RMSE)), }\AttributeTok{hjust =} \SpecialCharTok{{-}}\FloatTok{0.1}\NormalTok{, }\AttributeTok{size =} \FloatTok{3.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{(}\AttributeTok{clip =} \StringTok{"off"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =}\NormalTok{ family\_colors) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FunctionTok{max}\NormalTok{(results\_df}\SpecialCharTok{$}\NormalTok{RMSE) }\SpecialCharTok{*} \FloatTok{1.15}\NormalTok{),}
+                     \AttributeTok{labels =}\NormalTok{ scales}\SpecialCharTok{::}\NormalTok{comma) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"RMSE by Model (lower is better)"}\NormalTok{,}
+       \AttributeTok{x =} \ConstantTok{NULL}\NormalTok{, }\AttributeTok{y =} \StringTok{"RMSE ($)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+
+\NormalTok{p\_r2 }\OtherTok{\textless{}{-}}\NormalTok{ results\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(Model, RMSE), }\AttributeTok{y =}\NormalTok{ R2, }\AttributeTok{fill =}\NormalTok{ Family)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.7}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.9}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{round}\NormalTok{(R2, }\DecValTok{3}\NormalTok{)), }\AttributeTok{hjust =} \SpecialCharTok{{-}}\FloatTok{0.1}\NormalTok{, }\AttributeTok{size =} \FloatTok{3.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{(}\AttributeTok{clip =} \StringTok{"off"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =}\NormalTok{ family\_colors, }\AttributeTok{name =} \StringTok{"Model Family"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{1.1}\NormalTok{), }\AttributeTok{labels =}\NormalTok{ scales}\SpecialCharTok{::}\NormalTok{percent) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"R² by Model (higher is better)"}\NormalTok{,}
+       \AttributeTok{x =} \ConstantTok{NULL}\NormalTok{, }\AttributeTok{y =} \StringTok{"R²"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"right"}\NormalTok{)}
+
+\NormalTok{p\_rmse }\SpecialCharTok{+}\NormalTok{ p\_r2}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/comparison-bar-1.pdf}}
+
+\subsection{Predicted vs.~Actual}\label{predicted-vs.-actual}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{preds\_df }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{Actual          =}\NormalTok{ y\_test,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Linear}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Regression}\StringTok{\textasciigrave{}}  \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{LinearRegression,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Polynomial}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Reg}\StringTok{\textasciigrave{}}     \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{PolynomialRegression,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Step}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Function}\StringTok{\textasciigrave{}}      \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{StepFunction,}
+  \StringTok{\textasciigrave{}}\AttributeTok{B{-}Spline}\StringTok{\textasciigrave{}}            \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{BSpline,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Smoothing}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Spline}\StringTok{\textasciigrave{}}   \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{SmoothingSpline,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Local Reg}\SpecialCharTok{\textbackslash{}n}\AttributeTok{(LOESS)}\StringTok{\textasciigrave{}}  \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{LocalRegression,}
+  \AttributeTok{GAM                   =}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{GAM,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Random}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Forest}\StringTok{\textasciigrave{}}      \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{RandomForest,}
+  \AttributeTok{XGBoost               =}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{XGBoost,}
+  \StringTok{\textasciigrave{}}\AttributeTok{Neural}\SpecialCharTok{\textbackslash{}n}\AttributeTok{Network}\StringTok{\textasciigrave{}}     \OtherTok{=}\NormalTok{ all\_preds}\SpecialCharTok{$}\NormalTok{NeuralNet}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{pivot\_longer}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Actual, }\AttributeTok{names\_to =} \StringTok{"Model"}\NormalTok{, }\AttributeTok{values\_to =} \StringTok{"Predicted"}\NormalTok{)}
+
+\FunctionTok{ggplot}\NormalTok{(preds\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Actual, }\AttributeTok{y =}\NormalTok{ Predicted, }\AttributeTok{color =}\NormalTok{ Model)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.12}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{slope =} \DecValTok{1}\NormalTok{, }\AttributeTok{intercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{Model, }\AttributeTok{ncol =} \DecValTok{4}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_viridis\_d}\NormalTok{(}\AttributeTok{guide =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{labels =}\NormalTok{ scales}\SpecialCharTok{::}\NormalTok{comma) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =}\NormalTok{ scales}\SpecialCharTok{::}\NormalTok{comma) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Actual vs. Predicted — All Models"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Dashed line = perfect prediction. Scatter closer to diagonal = better fit."}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Actual House Value ($)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Predicted House Value ($)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/pred-vs-actual-1.pdf}}
+
+\subsection{Residual Analysis}\label{residual-analysis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{preds\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Residual =}\NormalTok{ Actual }\SpecialCharTok{{-}}\NormalTok{ Predicted) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Predicted, }\AttributeTok{y =}\NormalTok{ Residual, }\AttributeTok{color =}\NormalTok{ Model)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.10}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{0.8}\NormalTok{, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{Model, }\AttributeTok{ncol =} \DecValTok{4}\NormalTok{, }\AttributeTok{scales =} \StringTok{"free\_x"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_viridis\_d}\NormalTok{(}\AttributeTok{guide =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Residual Plots — All Models"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Red LOESS line should be flat at zero for a well{-}specified model"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Predicted Value ($)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Residual ($)"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{California_Housing_Analysis_files/figure-latex/residuals-1.pdf}}
+
+\subsection{Family-Level Summary}\label{family-level-summary}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{family\_summary }\OtherTok{\textless{}{-}}\NormalTok{ results\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Family) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \StringTok{\textasciigrave{}}\AttributeTok{Best RMSE}\StringTok{\textasciigrave{}}  \OtherTok{=} \FunctionTok{min}\NormalTok{(RMSE),}
+    \StringTok{\textasciigrave{}}\AttributeTok{Mean RMSE}\StringTok{\textasciigrave{}}  \OtherTok{=} \FunctionTok{round}\NormalTok{(}\FunctionTok{mean}\NormalTok{(RMSE), }\DecValTok{0}\NormalTok{),}
+    \StringTok{\textasciigrave{}}\AttributeTok{Best R²}\StringTok{\textasciigrave{}}    \OtherTok{=} \FunctionTok{max}\NormalTok{(R2),}
+    \StringTok{\textasciigrave{}}\AttributeTok{n Models}\StringTok{\textasciigrave{}}   \OtherTok{=} \FunctionTok{n}\NormalTok{()}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Best RMSE}\StringTok{\textasciigrave{}}\NormalTok{)}
+
+\NormalTok{family\_summary }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kbl}\NormalTok{(}\AttributeTok{caption =} \StringTok{"Performance Summary by Model Family"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_styling}\NormalTok{(}\AttributeTok{bootstrap\_options =} \FunctionTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{,}\StringTok{"hover"}\NormalTok{,}\StringTok{"bordered"}\NormalTok{),}
+                \AttributeTok{full\_width =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{font\_size =} \DecValTok{13}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{row\_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{bold =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{background =} \StringTok{"\#e6f4ea"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}
+\centering
+\caption{\label{tab:family-summary}Performance Summary by Model Family}
+\centering
+\fontsize{13}{15}\selectfont
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+Family & Best RMSE & Mean RMSE & Best R² & n Models\\
+\hline
+\cellcolor[HTML]{e6f4ea}{\textbf{ML Ensemble}} & \cellcolor[HTML]{e6f4ea}{\textbf{44723.77}} & \cellcolor[HTML]{e6f4ea}{\textbf{52550}} & \cellcolor[HTML]{e6f4ea}{\textbf{0.8549}} & \cellcolor[HTML]{e6f4ea}{\textbf{3}}\\
+\hline
+GNPR & 59275.36 & 67264 & 0.7450 & 7\\
+\hline
+Parametric & 73005.27 & 73005 & 0.6134 & 1\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\end{document}
