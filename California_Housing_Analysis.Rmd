@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-
+Group Members: Wendy Oira, Nehama Mburuki, Michelle Andrew, Methuselah Miningwo, Wesley Gathua, Diana Otieno, Denis Koome, Collins Oduor\
 
 # Introduction & Objectives
 
@@ -61,46 +61,22 @@ This project applies the nonparametric and semi-parametric regression techniques
 
 # Package Installation & Loading
 
+# Package Installation & Loading
+
 ```{r packages}
-# Install any missing packages
-required_pkgs <- c(
-  "tidyverse", "caret", "randomForest", "xgboost",
-  "mgcv", "splines", "np", "corrplot", "gridExtra",
-  "Metrics", "neuralnet", "ggplot2", "viridis", "scales",
-  "pdp", "vip", "spdep", "sf", "kableExtra", "GGally",
-  "patchwork", "ggrepel"
+pkgs <- c(
+  "tidyverse", "caret", "randomForest", "xgboost", "mgcv", "splines", "np", "corrplot", "gridExtra",
+  "Metrics", "neuralnet", "ggplot2", "viridis", "scales", "pdp", "vip", "spdep", "sf", "kableExtra",
+  "GGally", "patchwork", "ggrepel", "patchwork", "finalfit"
 )
 
-new_pkgs <- required_pkgs[!required_pkgs %in% rownames(installed.packages())]
-if (length(new_pkgs) > 0) {
-  install.packages(new_pkgs, dependencies = TRUE, repos = "https://cloud.r-project.org")
+for (pkg in pkgs) {
+  if (!(pkg %in% installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  library(pkg, character.only = T)
 }
-
-# Load libraries
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(caret)
-  library(randomForest)
-  library(xgboost)
-  library(mgcv)          # GAM, smoothing splines
-  library(splines)       # bs(), ns()
-  library(np)            # Kernel / local regression
-  library(corrplot)
-  library(gridExtra)
-  library(Metrics)       # rmse(), mae()
-  library(neuralnet)
-  library(ggplot2)
-  library(viridis)
-  library(scales)
-  library(pdp)           # Partial Dependence Plots
-  library(vip)           # Variable Importance Plots
-  library(spdep)         # Moran's I
-  library(sf)
-  library(kableExtra)
-  library(GGally)
-  library(patchwork)
-  library(ggrepel)
-})
 
 # Global ggplot theme
 theme_set(theme_minimal(base_size = 12) +
@@ -170,7 +146,7 @@ ggplot(data_long, aes(x = value)) +
 **Interpretations and Discussions**
 1. All variables except housing_median_age appeared to be positively skewed. This informed us that normality was possibly violated.\
 2. The `housing_median_age` appeared to be multi-modal.
-3. It was evident that some variables had been capped.`housing_median_age` was capped at approximately 50 years, `median_house_value` at approximately $ 500,000 and `median_income` at $ 15,000. Since this project was geared to predict accurate housing median proces, we proceeded to filter the capped values to avoid our future models from being somewhat corrupted.\
+3. It was evident that some variables had been capped.`housing_median_age` was capped at approximately 50 years, `median_house_value` at approximately \dollar 500,000 and `median_income` at $ 15,000. Since this project was geared to predict accurate housing median proces, we proceeded to filter the capped values to avoid our future models from being somewhat corrupted.\
 
 ```{r checking the max values of the capped variables}
 cat("The highest value for housing median age is:", max(data$housing_median_age), "\n")
@@ -215,11 +191,6 @@ We also saw a relatively strong correlation between median_income and median_hou
 We then generated the final fit summary table which informed us of the important variables influencing the median house prices.\
 
 ```{r finalfit-summary-table}
-# Loading required formatting packages
-library(finalfit)
-library(kableExtra)
-library(dplyr)
-
 # 1. Creating categorical dependent variable using existing 'clean_data'
 summary_data <- clean_data %>%
   mutate(
@@ -309,7 +280,7 @@ moran.plot(
 
 The positive slope of the regression line indicates positive spatial autocorrelation. This means that high-income areas tend to be near other high-income areas and low-income areas cluster together. The slope of this line is the Global Moran’s I value.\
 
-The Moran I statistic was 0.5894. This indicated a strong positive spatial autocorrelation, showing that median income levels are significantly clustered across the region. It confirmed that income is highly dependent on neighboring areas as seen that wealthy neighborhoods tend to cluster together, so do lower-income ones. The p-value was essentially zero, meaning the probability of this spatial pattern occurring by pure chance was non-existent, proving that geography played a fundamental role in income distribution.\
+The Moran I statistic was 0.5894. This indicated a moderate positive spatial autocorrelation, showing that median income levels are significantly clustered across the region. It confirmed that income is highly dependent on neighboring areas as seen that wealthy neighborhoods tend to cluster together, so do lower-income ones. The p-value was essentially zero, meaning the probability of this spatial pattern occurring by pure chance was non-existent, proving that geography played a fundamental role in income distribution.\
 
 ```{r moran-value, fig.height=5}
 # Moran's I — house value
@@ -371,6 +342,70 @@ This non-linear relationship complemented our spatial diagnostics. Given that Gl
 * Neighborhoods are clustered by income brackets due to economic segregation of some sorts.\
 
 **Conclusion:** Using a standard linear model for prediction here would introduce severe systemic bias. To properly model these data dynamics, we needed to implement non-linear specifications—such as polynomial terms, regression splines (B-Splines/Natural Splines) or generalized additive models (GAMs)—while simultaneously addressing spatial autocorrelation.\
+
+We then proceeded to plot each raw predictor against the dependent variable `median_house_value`.
+
+```{r nonlinearity-eda, fig.height=14, fig.width=12}
+# Defining the raw predictor variables
+vars <- c(
+  "longitude", "latitude", "housing_median_age",
+  "total_rooms", "total_bedrooms", "population",
+  "households", "median_income"
+)
+
+# Creating plots using lapply and modern tidy evaluation 
+plots <- lapply(vars, function(v) {
+  
+  ggplot(clean_data, aes(x = .data[[v]], y = median_house_value / 1e3)) +
+    geom_point(alpha = 0.12, color = "#2e6da4", size = 0.7) +
+    
+    # LOESS nonlinear fit (Red)
+    geom_smooth(
+      method = "loess",
+      color = "#c0392b",
+      linewidth = 1.1,
+      se = TRUE
+    ) +
+    
+    # Linear regression fit (Green Dashed)
+    geom_smooth(
+      method = "lm",
+      color = "#27ae60",
+      linewidth = 0.9,
+      linetype = "dashed",
+      se = FALSE
+    ) +
+    
+    labs(
+      title = paste(v, "vs Median House Value"),
+      subtitle = "Red = LOESS | Green dashed = Linear",
+      x = v,
+      y = "Median House Value ($K)"
+    ) +
+    
+    theme_minimal(base_size = 11)
+})
+
+# Combine all 8 plots into a 4x2 grid
+wrap_plots(plots, ncol = 2)
+```
+**Interpretations and Discussions**\
+We overlaid a flexible, non-parametric LOESS smooth (solid red curve) alongside a rigid OLS linear regression fit (dashed green line).\
+
+The visual difference between these two lines reveal structural limitations in pure linear modeling:\
+
+1. Geography (Longitude and Latitude): 
+ * Bi-modal effect: The geographic variables (longitude and latitude) exhibit profound, highly non-linear relationships with house values. The red LOESS curve showed distinct bimodal peaks around $-122.5^\circ$ longitude (the San Francisco Bay Area) and $-118^\circ$ longitude (Greater Los Angeles).\
+ * Linear Failure: Because a linear model can only assign a single flat slope across the entire state, the green dashed line is virtually horizontal for longitude and slopes slightly downward for latitude. This completely flattens out and ignores the massive premiums associated with California's major coastal economic hubs.\
+ 
+2. The Socio-economic driver (Median Income):\
+ * The Sigmoidal S-Curve: As expected, `median_income` displayed the strongest individual relationship with property values. However, the LOESS fit revealed a distinct sigmoidal (S-shaped) curve rather than a perfectly straight line. Property values plateaued slightly at very low income levels, scaled aggressively and near-linearly between $\$20,000$ and $\$80,000$, and then plateaued sharply near the $\$500,000$ mark.\
+
+3. Structural scale predictors (Rooms, bedrooms, population, households):\
+ * Diminishing Marginal Returns: The raw volume metrics, `total_rooms`, `total_bedrooms`, `population`, and households shared a nearly identical non-linear profile. The red LOESS curves rose sharply at first but quickly bent over and plateaued. This represented a clear economic principle of diminishing marginal returns whereby adding more rooms or population to a block group did not indefinitely drive up median prices in a linear fashion.\
+
+4. Housing Age\
+ * The flat baseline: `housing_median_age` was the only variable where the LOESS curve and the linear model roughly agreed, remaining relatively flat across.\ 
 
 ------------------------------------------------------------------------
 Before proceeding to feature engineering, we did a final check on our data to see if there were some null values disguised as `na`.\
@@ -1160,8 +1195,6 @@ Random Forest is an ensemble of decorrelated decision trees trained on bootstrap
 
 ```{r rf-model}
 # Random Forest Model (Tree-Based Ensembles)
-library(randomForest)
-
 set.seed(42)
 rf_model <- randomForest(
   x          = X_train,
@@ -1219,8 +1252,6 @@ The project now proceeded to XG Boost.\
 XGBoost (eXtreme Gradient Boosting) sequentially fits shallow trees to residuals using second-order gradient information. L1/L2 regularisation and subsampling control overfitting — playing the role of $\lambda$ in the smoothing spline penalty framework.\
 
 ```{r xgb-model}
-library(xgboost)
-
 # Converting matrices to the optimized DMatrix format required by xgboost
 dtrain <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
 dtest  <- xgb.DMatrix(data = as.matrix(X_test),  label = y_test)
@@ -1288,9 +1319,6 @@ Despite `median_income` being the dominant feature in both XGBoost and Ramdom Fo
 A Multilayer Perceptron (MLP) with one hidden layer. Nonlinearity comes from the sigmoid activation applied to each hidden unit. Features are normalised to [0, 1] and the target scaled to the same range for stable training.\
 
 ```{r nn-model}
-library(neuralnet)
-library(caret)
-
 # Normalizing inputs for the neural network
 preproc_nn  <- preProcess(X_train, method = c("center", "scale"))
 X_train_nn  <- predict(preproc_nn, X_train)
@@ -1353,9 +1381,6 @@ The XG Boost feature importance (Gain) plot demonstrated that once the model uti
 Interaction between income and location is also made manifest by the following plots, beginning with the latitude focused (North-South) followed by longitude focused (East-West):\
 
 ```{r rq1-income-lat, fig.height=6, fig.width=10}
-library(ggplot2)
-library(dplyr)
-
 # Creating regional cuts
 clean_data <- clean_data %>%
   mutate(
@@ -1400,10 +1425,6 @@ As expected, the `Coastal` curve exhibited an aggressive elevation as income inc
 
 
 ```{r model-comparison-table}
-library(dplyr)
-library(stringr)
-library(kableExtra)
-
 results_df <- bind_rows(all_metrics) %>%
   arrange(RMSE) %>%
   mutate(
@@ -1441,10 +1462,6 @@ From the table above, XGBoost achieved the highest predictive accuracy. It minim
 Below is a side by side comparison of the models' `RMSE` and `R2`.\
 
 ```{r comparison-bar, fig.height=6, fig.width=12}
-library(ggplot2)
-library(patchwork)
-library(scales)
-
 family_colors <- c("Parametric Baseline" = "#f39c12", "GNPR" = "#2e6da4", "ML Ensemble" = "#27ae60")
 
 # 1. Building the RMSE Plot
@@ -1480,11 +1497,6 @@ p_rmse + p_r2
 The plot below showed the robustness of the tree based models as they had the better fit of them all.\
 
 ```{r pred-vs-actual, fig.height=10, fig.width=12}
-library(ggplot2)
-library(tidyr)
-library(dplyr)
-library(scales)
-
 # Compiling predictions
 preds_df <- tibble(
   Actual              = y_test,
@@ -1554,9 +1566,6 @@ As expected, tree based models emerged superior with XGBoost proving to be robus
 We then finally compared the models in terms of their families as shown below:\
 
 ```{r family-summary}
-library(dplyr)
-library(kableExtra)
-
 family_summary <- results_df %>%
   group_by(Family) %>%
   summarise(
