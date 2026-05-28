@@ -19,8 +19,8 @@ output:
     fig_height: 6
 ---
 
-Collins Oduor - 219858 | Michelle Kalevela - 222647 | Diana Otieno - 222658
-Methuselah Amtany - 223930 | Wesley Gathua - 223347 | Dennis Koome - 193582
+Collins Oduor - 219858 | Michelle Kalevela - 222647 | Diana Otieno - 222658|
+Methuselah Amtany - 223930 | Wesley Gathua - 223347 | Dennis Koome - 193582|
 Wendy Oira - 221007 | Nehema Mburuki - 190546
 
 
@@ -365,7 +365,7 @@ This non-linear relationship complemented our spatial diagnostics. Given that Gl
 
 - We then proceeded to plot each raw predictor against the dependent variable `median_house_value`.
 
-```{r nonlinearity-eda, fig.height=14, fig.width=12}
+```{r nonlinearity-eda, eval=FALSE, fig.height=14, fig.width=12, include=FALSE}
 # Defining the raw predictor variables
 vars <- c(
   "longitude", "latitude", "housing_median_age",
@@ -1417,6 +1417,100 @@ print(nn_metrics)
 ```
 
 - Our tenth and final model explored a Neural Network to observe how a network of artificial neurons handles complex spatial-demographic data. Due to neural networks being highly sensitive to variable scales, we applied a Z-score standardization to all predictors and a Min-Max scaling transformation to compress the target house values into a stable $[0, 1]$ range.The network achieved mathematical convergence. After generating test-set predictions and inverse-transforming them back into real-world dollar amounts, the model yielded a final test-set RMSE of 53,561 and an R-squared of 0.689. This informed us that the network successfully explained 68.9\% of the variation in California home values, missing the target by an average of \$53,561.
+
+
+# Model 11 - Spatial Models
+
+- Testing for spatial dependency
+
+```{r spatial-lm-tests}
+library(spdep)
+library(sf)
+
+# ── 1. OLS baseline ───────────────────────────────────────────────────────────
+ols_model <- lm_model
+
+# ── 2. Rebuild spatial weights to match the training rows in ols_model ────────
+# lw was built on the full clean_data (18,553 rows); ols_model was fit on
+# train_sc (14,845 rows), so we subset the spatial object accordingly.
+model_rows  <- as.integer(rownames(ols_model$model))
+spatial_sub <- spatial_obj[model_rows, ]
+knn5_sub    <- knn2nb(knearneigh(st_coordinates(spatial_sub), k = 5))
+lw_sub      <- nb2listw(knn5_sub, style = "W")
+
+# ── 3. Lagrange Multiplier tests ──────────────────────────────────────────────
+lm_tests <- lm.RStests(
+  model  = ols_model,
+  listw  = lw_sub,
+  test   = "all"
+)
+
+print(summary(lm_tests))
+
+cat("\nDecision guide: adjRSlag > adjRSerr => Spatial Lag preferred; both robust => SARAR\n")
+```
+
+Both the standard and robust LM tests are highly significant (p < 2.2e-16), confirming strong spatial dependence in the OLS residuals. The robust Spatial Lag statistic (adjRSlag = 1,826.6) exceeds the robust Spatial Error statistic (adjRSerr = 1,249.9), pointing toward a **Spatial Lag Model** as the primary specification. We fit both a Spatial Lag Model and a Spatial Error Model and compare them by AIC and log-likelihood to confirm the better fit.
+
+
+```{r spatial-slm, message=FALSE}
+library(spatialreg)
+
+# ── 4. Spatial Lag Model (SLM) ────────────────────────────────────────────────
+# The lagged dependent variable Wy captures the influence of neighbours' house values.
+slm_model <- lagsarlm(
+  formula = lm_formula,
+  data    = train_sc,
+  listw   = lw_sub,
+  method  = "eigen"
+)
+
+cat("── Spatial Lag Model (SLM) ─────────────────────────────────────────\n")
+summary(slm_model)
+```
+
+
+
+```{r spatial-sem, message=FALSE}
+# ── 5. Spatial Error Model (SEM) ──────────────────────────────────────────────
+# The spatial filter on the error term absorbs unmeasured spatially correlated factors.
+sem_model <- errorsarlm(
+  formula = lm_formula,
+  data    = train_sc,
+  listw   = lw_sub,
+  method  = "eigen"
+)
+
+cat("── Spatial Error Model (SEM) ───────────────────────────────────────\n")
+summary(sem_model)
+```
+
+
+
+
+```{r spatial-model-comparison}
+# ── 6. Model comparison: OLS vs SLM vs SEM ────────────────────────────────────
+comparison <- data.frame(
+  Model  = c("OLS", "SLM (Spatial Lag)", "SEM (Spatial Error)"),
+  LogLik = round(c(as.numeric(logLik(ols_model)),
+                   as.numeric(logLik(slm_model)),
+                   as.numeric(logLik(sem_model))), 2),
+  AIC    = round(c(AIC(ols_model), AIC(slm_model), AIC(sem_model)), 2)
+)
+
+comparison <- comparison[order(comparison$AIC), ]
+print(comparison)
+
+cat("\nLower AIC = better fit. The model with the smallest AIC is preferred.\n")
+```
+
+
+
+
+
+
+
+
 
 ---
 
