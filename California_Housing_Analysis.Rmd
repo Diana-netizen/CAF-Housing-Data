@@ -74,40 +74,17 @@ required_pkgs <- c(
   "mgcv", "splines", "np", "corrplot", "gridExtra",
   "Metrics", "neuralnet", "ggplot2", "viridis", "scales",
   "pdp", "vip", "spdep", "sf", "kableExtra", "GGally",
-  "patchwork", "ggrepel", "finalfit"
+  "patchwork", "ggrepel", "finalfit", "spatialreg", "spdep",
+  "sf", "spam"
 )
 
-new_pkgs <- required_pkgs[!required_pkgs %in% rownames(installed.packages())]
-if (length(new_pkgs) > 0) {
-  install.packages(new_pkgs, dependencies = TRUE, repos = "https://cloud.r-project.org")
+for (pkg in required_pkgs) {
+  if(!(pkg %in% installed.packages())) {
+    install.packages(pkg)
+  }
+  
+  library(pkg, character.only = T)
 }
-
-# Load libraries
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(caret)
-  library(randomForest)
-  library(xgboost)
-  library(mgcv)          # GAM, smoothing splines
-  library(splines)       # bs(), ns()
-  library(np)            # Kernel / local regression
-  library(corrplot)
-  library(gridExtra)
-  library(Metrics)       # rmse(), mae()
-  library(neuralnet)
-  library(ggplot2)
-  library(viridis)
-  library(scales)
-  library(pdp)           # Partial Dependence Plots
-  library(vip)           # Variable Importance Plots
-  library(spdep)         # Moran's I
-  library(sf)
-  library(kableExtra)
-  library(GGally)
-  library(patchwork)
-  library(ggrepel)
-  library(finalfit)
-})
 
 # Global ggplot theme
 theme_set(theme_minimal(base_size = 12) +
@@ -121,7 +98,7 @@ theme_set(theme_minimal(base_size = 12) +
 
 ```{r load-data}
 # Load dataset (no header row) 
-data <- read.csv("D:/Module 3/Linear Models/California Housing Price project/Github/cal_housing.data", header = FALSE)
+data <- read.csv("~/Downloads/cal_housing.data", header = FALSE)
 
 
 colnames(data) <- c("longitude", "latitude", "housing_median_age",
@@ -1424,8 +1401,6 @@ print(nn_metrics)
 - Testing for spatial dependency
 
 ```{r spatial-lm-tests}
-library(spdep)
-library(sf)
 
 # ── 1. OLS baseline ───────────────────────────────────────────────────────────
 ols_model <- lm_model
@@ -1454,15 +1429,13 @@ Both the standard and robust LM tests are highly significant (p < 2.2e-16), conf
 
 
 ```{r spatial-slm, message=FALSE}
-library(spatialreg)
-
 # ── 4. Spatial Lag Model (SLM) ────────────────────────────────────────────────
 # The lagged dependent variable Wy captures the influence of neighbours' house values.
-slm_model <- lagsarlm(
+slm_model <- spatialreg::lagsarlm(
   formula = lm_formula,
   data    = train_sc,
   listw   = lw_sub,
-  method  = "eigen"
+  method  = "LU"
 )
 
 cat("── Spatial Lag Model (SLM) ─────────────────────────────────────────\n")
@@ -1478,7 +1451,7 @@ sem_model <- errorsarlm(
   formula = lm_formula,
   data    = train_sc,
   listw   = lw_sub,
-  method  = "eigen"
+  method  = "LU"
 )
 
 cat("── Spatial Error Model (SEM) ───────────────────────────────────────\n")
