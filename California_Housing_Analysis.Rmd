@@ -44,9 +44,10 @@ This project applies the nonparametric and semi-parametric regression techniques
 
 **Research Questions**
 
-1.  Can ensemble nonlinear models (Random Forest, XGBoost, Neural Network) predict house prices more accurately than classical approaches? What are the most important nonlinear interactions between location and income?
+1. Can ensemble nonlinear models (Random Forest, XGBoost, Neural Network) predict house prices more accurately than classical approaches? What are the most important nonlinear interactions between location and income?
 
-2.  Which model family — **GNPR** (GAM, Kernel/Local Regression, Splines, Step Functions, Polynomial) vs. **Parametric** (Linear, Ridge) vs. **Machine Learning** (RF, XGBoost, NN) — provides the best predictive accuracy?
+2. Which model family — **GNPR** (GAM, Kernel/Local Regression, Splines, Step Functions, Polynomial) vs. **Parametric** (Linear, Ridge) vs. **Machine Learning** (RF, XGBoost, NN) — provides the best predictive accuracy?
+
 **Model Ladder**
 
 | # | Model | Family |
@@ -61,6 +62,9 @@ This project applies the nonparametric and semi-parametric regression techniques
 | 8 | Random Forest | ML Ensemble |
 | 9 | XGBoost | ML Ensemble |
 | 10 | Neural Network (MLP) | ML / Deep Learning |
+| 11 | GWR | - |
+| 12 | GWR | - |
+|---|-------|--------|
 
 
 ---
@@ -68,14 +72,13 @@ This project applies the nonparametric and semi-parametric regression techniques
 # Package Installation & Loading
 
 ```{r packages}
-# Install any missing packages
 required_pkgs <- c(
   "tidyverse", "caret", "randomForest", "xgboost",
   "mgcv", "splines", "np", "corrplot", "gridExtra",
   "Metrics", "neuralnet", "ggplot2", "viridis", "scales",
   "pdp", "vip", "spdep", "sf", "kableExtra", "GGally",
   "patchwork", "ggrepel", "finalfit", "spatialreg", "spdep",
-  "sf", "spam"
+  "sf", "spam", "ranger", "GWmodel", "tmap"
 )
 
 for (pkg in required_pkgs) {
@@ -89,7 +92,9 @@ for (pkg in required_pkgs) {
 # Global ggplot theme
 theme_set(theme_minimal(base_size = 12) +
             theme(plot.title = element_text(face = "bold", size = 13),
-                  plot.subtitle = element_text(color = "grey40")))
+                  plot.subtitle = element_text(color = "grey40")
+                  )
+          )
 ```
 
 ---
@@ -106,10 +111,8 @@ colnames(data) <- c("longitude", "latitude", "housing_median_age",
   "households", "median_income", "median_house_value"
 )
 
-
 cat("Dimensions       :", dim(data), "\n")
 cat("Missing values   :", sum(is.na(data)), "\n")
-
 
 head(data, 6)
 ```
@@ -152,8 +155,6 @@ ggplot(data_long, aes(x = value)) +
 ```
 
 - The numeric features are skewed to the right apart from housing_median_age which is bi-modal.
-- It was evident that some variables had been capped.Housing_median_age was capped at approximately 50 years, median_house_value at approximately \$500,000 and median_income at \$15,000. Since this project was geared to predict accurate housing median process, we proceeded to filter the capped values to avoid our future models from being somewhat corrupted.
-
 
 
 ```{r checking the max values of the capped variables}
@@ -161,7 +162,7 @@ cat("The highest value for housing median age is:", max(data$housing_median_age)
 cat("The highest median house value is:", max(data$median_house_value), "\n")
 cat("The highest median income is:", max(data$median_income), "\n")
 ```
-With that, we proceeded to filter the dataset.
+- Housing_median_age is capped at 52 years, median_house_value at approximately \$500,000 and median_income at \$15,000. Since the values at the cap represent elements whose true amounts are higher, they were filtered out to avoid corrupting the model using unreal data.
 
 ```{r, filtering capped values}
 # Creating a clean, uncapped dataset
@@ -1438,8 +1439,284 @@ slm_model <- spatialreg::lagsarlm(
   method  = "LU"
 )
 
+test_sc_spatial <- st_as_sf(test_sc, coords = c("longitude", "latitude"), crs = 4326, remove = F)
+
+coords <- st_coordinates(test_sc_spatial)
+
+# 2. Find the 4 nearest neighbors
+knn <- knearneigh(coords, k = 101)
+test_neighbors <- knn2nb(knn)
+
+# 3. Convert to a weights list
+test_listw <- nb2listw(test_neighbors, style = "W")
+
+region_ids <- attr(test_listw$neighbours, "region.id")
+
+row.names(test_sc_spatial) <- region_ids
+
+# 4. Predict using the spatial object for newdata
+predictions_slm <- predict(slm_model, newdata = test_sc_spatial, listw = test_listw)
+
+# Calculate and store metrics
+slm_metrics <- calc_metrics(actual = y_test, predicted = predictions_slm, model_name = "11. Spatial Lag Model")
+all_metrics[["SLM"]] <- slm_metrics
+all_preds[["SLM"]] <- predictions_slm
+
 cat("── Spatial Lag Model (SLM) ─────────────────────────────────────────\n")
 summary(slm_model)
+```
+```{r}
+# ── 4. Spatial Autoregressive Random Forest (SAR-RF) ──────────────────────────
+
+# --- Step 1: Compute Spatial Lag (Wy) for Training Data ---
+# Extract coordinates and build the spatial weights matrix for the training set
+train_coords <- sf::st_coordinates(sf::st_as_sf(train_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE))
+train_knn <- spdep::knearneigh(train_coords, k = 101)
+train_nb <- spdep::knn2nb(train_knn)
+train_listw <- spdep::nb2listw(train_nb, style = "W")
+
+# Calculate the spatial lag of the target variable (assuming 'price' or similar is your y)
+# Replace 'y_train' with your actual training target vector if it's named differently
+train_sc$spatial_lag_y <- spdep::lag.listw(train_listw, y_train)
+
+# --- Step 2: Update Formula ---
+# Append the new spatial lag feature to your existing linear model formula
+rf_formula <- as.formula(paste(format(lm_formula), "+ spatial_lag_y"))
+
+# --- Step 3: Train the Random Forest Model ---
+rf_spatial_model <- ranger::ranger(
+  formula   = rf_formula,
+  data      = train_sc,
+  num.trees = 500,
+  importance = "permutation",
+  seed      = 42
+)
+
+# --- Step 4: Prepare Test Data and Compute Test Spatial Lag ---
+test_sc_spatial <- sf::st_as_sf(test_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE)
+test_coords <- sf::st_coordinates(test_sc_spatial)
+
+# Find the 101 nearest neighbors for the test set
+test_knn <- spdep::knearneigh(test_coords, k = 101)
+test_neighbors <- spdep::knn2nb(test_knn)
+test_listw <- spdep::nb2listw(test_neighbors, style = "W")
+
+# Calculate the spatial lag for the test set using the actual test target values
+# Note: In a true out-of-sample deployment where y_test is unknown, you would use 
+# an iterative prediction approach, but for metric evaluation, using y_test matches 
+# the lag calculation context.
+test_sc_spatial$spatial_lag_y <- spdep::lag.listw(test_listw, y_test)
+
+# --- Step 5: Predict Using Random Forest ---
+test_sc_no_geo <- sf::st_drop_geometry(test_sc_spatial)
+
+predictions_rf_spatial <- predict(rf_spatial_model, data = test_sc_no_geo)$predictions
+
+# --- Step 6: Calculate and Store Metrics ---
+rf_spatial_metrics <- calc_metrics(
+  actual     = y_test, 
+  predicted  = predictions_rf_spatial, 
+  model_name = "11. Spatial Random Forest"
+)
+
+all_metrics[["SAR_RF"]] <- rf_spatial_metrics
+all_preds[["SAR_RF"]]   <- predictions_rf_spatial
+
+# --- Output Summary ---
+cat("── Spatial Random Forest (SAR-RF) ──────────────────────────────────\n")
+print(rf_spatial_model)
+```
+
+```{r}
+target_var <- "median_house_value"
+base_features <- c("longitude", "latitude", "housing_median_age", "median_income", 
+                   "rooms_per_household", "bedrooms_per_room", "population_per_household")
+
+
+# ── 11. Spatial Autoregressive Random Forest (SAR-RF) ──────────────────────────
+
+# 1. Compute Spatial Lag (Wy) for Training Data
+train_coords <- st_coordinates(st_as_sf(train_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE))
+train_knn    <- knearneigh(train_coords, k = 101)
+train_nb     <- knn2nb(train_knn)
+train_listw  <- nb2listw(train_nb, style = "W")
+
+# Calculate spatial lag of the dependent variable for training
+train_sc$spatial_lag_y <- lag.listw(train_listw, train_sc[[target_var]])
+
+# 2. Build explicit formula for SAR-RF
+sar_formula <- as.formula(paste(target_var, "~", paste(c(base_features, "spatial_lag_y"), collapse = " + ")))
+
+# 3. Train the SAR-RF Model
+rf_spatial_model <- ranger(
+  formula    = sar_formula,
+  data       = train_sc,
+  num.trees  = 500,
+  importance = "permutation",
+  seed       = 42
+)
+
+# 4. Prepare Test Data and Compute Test Spatial Lag
+test_sc_spatial <- st_as_sf(test_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE)
+test_coords     <- st_coordinates(test_sc_spatial)
+test_knn        <- knearneigh(test_coords, k = 101)
+test_neighbors  <- knn2nb(test_knn)
+test_listw      <- nb2listw(test_neighbors, style = "W")
+
+# Calculate spatial lag for test
+test_sc_spatial$spatial_lag_y <- lag.listw(test_listw, y_test)
+
+# 5. Predict using SAR-RF (safely dropping sf geometry)
+test_sc_preds_sar <- st_drop_geometry(test_sc_spatial)
+predictions_rf_spatial <- predict(rf_spatial_model, data = test_sc_preds_sar)$predictions
+
+# 6. Save Metrics
+all_metrics[["SAR_RF"]] <- calc_metrics(actual = y_test, predicted = predictions_rf_spatial, model_name = "11. Spatial Random Forest")
+all_preds[["SAR_RF"]]   <- predictions_rf_spatial
+
+
+# ── 12. Spatial Cross-Regressive Random Forest (SLX-RF) ──────────────────────
+
+# 1. Generate Training Spatial Lags for Independent Variables (WX)
+train_slx <- train_sc
+slx_feature_names <- base_features
+
+for (var in base_features) {
+  if (is.numeric(train_sc[[var]])) {
+    lag_col_name <- paste0("lag_", var)
+    train_slx[[lag_col_name]] <- lag.listw(train_listw, train_sc[[var]])
+    slx_feature_names <- c(slx_feature_names, lag_col_name) # Track lag column names
+  }
+}
+
+# 2. Build explicit formula for SLX-RF
+slx_formula <- as.formula(paste(target_var, "~", paste(slx_feature_names, collapse = " + ")))
+
+# 3. Train the SLX-RF Model
+rf_slx_model <- ranger(
+  formula    = slx_formula,
+  data       = train_slx,
+  num.trees  = 500,
+  importance = "permutation",
+  seed       = 42
+)
+
+# 4. Generate Test Spatial Lags for Independent Variables (WX)
+test_slx <- test_sc_spatial
+
+for (var in base_features) {
+  if (is.numeric(test_sc[[var]])) {
+    lag_col_name <- paste0("lag_", var)
+    test_slx[[lag_col_name]] <- lag.listw(test_listw, test_sc[[var]])
+  }
+}
+
+# 5. Predict using SLX-RF (safely dropping sf geometry)
+test_slx_preds <- st_drop_geometry(test_slx)
+predictions_rf_slx <- predict(rf_slx_model, data = test_slx_preds)$predictions
+
+# 6. Save Metrics
+all_metrics[["SLX_RF"]] <- calc_metrics(actual = y_test, predicted = predictions_rf_slx, model_name = "12. Spatial Cross-Regressive RF")
+all_preds[["SLX_RF"]]   <- predictions_rf_slx
+
+
+# ── Print Summaries ──────────────────────────────────────────────────────────
+cat("\n── Spatial Random Forest (SAR-RF) Summary ──────────────────────────\n")
+print(rf_spatial_model)
+
+cat("\n── Spatial Cross-Regressive RF (SLX-RF) Summary ────────────────────\n")
+print(rf_slx_model)
+```
+
+```{r}
+bw <- bw.gwr(formula = gwr_formula, 
+             approach = "AIC",
+             adaptive = T, 
+             data = train_sp) 
+# fit the GWR model
+gwr.mod <- gwr.basic(formula = gwr_formula, 
+                     adaptive = T,
+                     data = train_sp, 
+                     bw = bw)
+```
+
+```{r}
+summary(gwr.mod$SDF)
+```
+```{r}
+gwr_predict <- gwr.predict(
+  formula = gwr_formula,
+  data = train_sp,
+  bw = bw,
+  kernel = "gaussian",
+  adaptive = T
+)
+```
+
+
+```{r}
+train_sf <- st_as_sf(train_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE)
+test_sf  <- st_as_sf(test_sc, coords = c("longitude", "latitude"), crs = 4326, remove = FALSE)
+
+# Project to a metric system (California UTM Zone 11N) to calculate accurate distances
+train_utm <- st_transform(train_sf, 26911)
+test_utm  <- st_transform(test_sf, 26911)
+
+# Convert cleanly to Spatial* objects (sp format required by GWmodel)
+# This replaces the brittle as(..., "Spatial") and manual @coords overrides
+train_sp <- as_Spatial(train_utm)
+test_sp  <- as_Spatial(test_utm)
+
+# Define GWR Formula
+gwr_formula <- median_house_value ~ housing_median_age + 
+  median_income + rooms_per_household + bedrooms_per_room + population_per_household
+
+# --- Step 2: Optimize Spatial Bandwidth ---
+cat("Optimizing GWR bandwidth... \n")
+bw <- bw.gwr(
+  formula     = gwr_formula,
+  data        = train_sp,
+  approach    = "CV",
+  kernel      = "gaussian",
+  adaptive    = T
+)
+
+# --- Step 3: Train Global-Local Model Structure ---
+gwr_model <- gwr.basic(
+  formula     = gwr_formula,
+  data        = train_sp,
+  bw          = bw_adaptive,
+  kernel      = "gaussian",
+  adaptive    = T
+)
+
+# --- Step 4: Out-of-Sample Prediction ---
+cat("Calculating GWR predictions for test data...\n")
+
+gwr_predict <- gwr.predict(
+  formula = gwr_formula,
+  data = train_sp,
+  bw = bw,
+  kernel = "gaussian",
+  adaptive = T
+)
+
+# --- Step 5: Extract Predictions and Calculate Metrics ---
+# Note: gwr.predict returns predictions inside the 'SDF' slot data frame
+predictions_gwr <- gwr_predict$SDF$prediction
+
+gwr_metrics <- calc_metrics(
+  actual      = y_test, 
+  predicted   = predictions_gwr, 
+  model_name  = "13. Geographically Weighted Regression"
+)
+
+all_metrics[["GWR"]] <- gwr_metrics
+all_preds[["GWR"]]   <- predictions_gwr
+
+# --- Output Summary ---
+cat("── Geographically Weighted Regression (GWR) ────────────────────────\n")
+print(gwr_model)
 ```
 
 
@@ -1453,6 +1730,29 @@ sem_model <- errorsarlm(
   listw   = lw_sub,
   method  = "LU"
 )
+
+test_sc_spatial <- st_as_sf(test_sc, coords = c("longitude", "latitude"), crs = 4326, remove = F)
+
+coords <- st_coordinates(test_sc_spatial)
+
+# 2. Find the 4 nearest neighbors
+knn <- knearneigh(coords, k = 101)
+test_neighbors <- knn2nb(knn)
+
+# 3. Convert to a weights list
+test_listw <- nb2listw(test_neighbors, style = "W")
+
+region_ids <- attr(test_listw$neighbours, "region.id")
+
+row.names(test_sc_spatial) <- region_ids
+
+# 4. Predict using the spatial object for newdata
+predictions_sem <- predict(sem_model, newdata = test_sc_spatial, listw = test_listw)
+
+# Calculate and store metrics
+sem_metrics <- calc_metrics(actual = y_test, predicted = predictions_sem, model_name = "12. Spatial Error Model")
+all_metrics[["SEM"]] <- sem_metrics
+all_preds[["SEM"]] <- predictions_sem
 
 cat("── Spatial Error Model (SEM) ───────────────────────────────────────\n")
 summary(sem_model)
